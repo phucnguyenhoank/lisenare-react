@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { fetchExercises } from "../api/exercises";
+import { useEffect, useState } from "react";
+import { fetchReadings } from "../api/reading";
 import ExerciseCard from "../components/ExerciseCard";
 
 export default function ExercisesPage() {
@@ -10,7 +10,7 @@ export default function ExercisesPage() {
   useEffect(() => {
     async function getData() {
       try {
-        const data = await fetchExercises();
+        const data = await fetchReadings();
         setExercises(data);
       } catch (err) {
         setError(err.message);

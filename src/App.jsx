@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ExercisesPage from "./pages/ExercisesPage";
+import ReadingPage from "./pages/ReadingPage";
 import Navbar from "./components/Navbar";
 
 function App() {
@@ -9,7 +10,9 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<ExercisesPage />} />
-        <Route path="/my-lessons" element={<h1 className="p-4">My Lessons Page</h1>} />
+        <Route path="/reading/:id" element={<ReadingPage />} />
+        <Route path="/my-lessons" element={<h1 className="p-4">You Lessons Will Appear Here</h1>} />
+        
       </Routes>
     </Router>
   );
