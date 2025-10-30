@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { getStudySession, setStudySessionRating } from "../api/studySession"
 
 export default function StudyResultPage() {
   const { id } = useParams();
@@ -10,9 +11,7 @@ export default function StudyResultPage() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/study_sessions/${id}`);
-        if (!res.ok) throw new Error("Failed to load result");
-        const data = await res.json();
+        const data = await getStudySession(id);
         setResult(data);
         setRating(data.rating);
       } catch (err) {
@@ -24,15 +23,12 @@ export default function StudyResultPage() {
     load();
   }, [id]);
 
+
   const handleRatingChange = async (newRating) => {
     try {
       // optimistic UI
       setRating(newRating);
-      await fetch(`http://127.0.0.1:8000/study_sessions/${id}/rating`, {
-        method: "PATCH",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ rating: newRating })
-      });
+      setStudySessionRating(id, newRating);
     } catch (err) {
       console.error(err);
       // revert if you want

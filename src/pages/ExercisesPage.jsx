@@ -21,7 +21,7 @@ export default function ExercisesPage() {
     getData();
   }, []);
 
-  if (loading) return <p className="text-gray-500 p-4">Loading exercises...</p>;
+  if (loading) return <p>Loading exercises...</p>;
   if (error) return <p className="text-red-500 p-4">Error: {error}</p>;
 
   return (
