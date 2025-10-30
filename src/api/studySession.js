@@ -1,7 +1,7 @@
 import { apiGet, apiPatch, apiPost } from "./client";
 
 // Centralized function to submit a study session
-export async function submitStudySession({ userId = 1, readingId, answers, rating = 3, timeSpent = 0 }) {
+export async function submitStudySession({ userId = 1, readingId, answers, rating = 0, timeSpent = 0 }) {
   // Convert answers (object like {1:0,2:1,3:2}) → "0,1,2"
   const userAnswers = Object.values(answers).join(",");
 
