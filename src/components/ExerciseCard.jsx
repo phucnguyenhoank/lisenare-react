@@ -1,27 +1,42 @@
+// src/components/ExerciseCard.jsx
 import { useEffect, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { submitStudySession, setStudySessionRating } from "../api/studySession";
+import { apiPost } from "../api/client";
 
 export default function ExerciseCard({ exercise }) {
   // ---------- Visibility & dwell time ----------
-  const { ref: viewRef, inView } = useInView({ threshold: 0.85 });
+  const { ref: viewRef, inView } = useInView({ threshold: 0 });
   const dwellRef = useRef(0);
   const timerRef = useRef(null);
+  const [hasLoggedView, setHasLoggedView] = useState(false);
+  const [hasLoggedSkip, setHasLoggedSkip] = useState(false);
 
   useEffect(() => {
     if (inView) {
+      // entering view -> start timer
+      setHasLoggedSkip(false);
       const start = Date.now();
       timerRef.current = setInterval(() => {
         dwellRef.current = Date.now() - start;
-        if (dwellRef.current >= 3000) log("view");
-      }, 100);
+        // log view only once after 3s
+        if (dwellRef.current >= 3000 && !hasLoggedView) {
+          sendLog("view");
+          setHasLoggedView(true);
+        }
+      }, 150);
     } else {
-      if (dwellRef.current < 3000 && dwellRef.current > 0) log("skip");
+      // leaving view -> if didn't reach 3s, log skip (only once)
+      if (!hasLoggedView && dwellRef.current > 0 && !hasLoggedSkip) {
+        sendLog("skip", { dwell_ms: dwellRef.current });
+        setHasLoggedSkip(true);
+      }
+      // reset
       dwellRef.current = 0;
       clearInterval(timerRef.current);
     }
     return () => clearInterval(timerRef.current);
-  }, [inView]);
+  }, [inView, hasLoggedView, hasLoggedSkip]);
 
   // ---------- Interaction ----------
   const [answers, setAnswers] = useState({});
@@ -33,7 +48,7 @@ export default function ExerciseCard({ exercise }) {
   const handleSelect = (qId, optIdx) => {
     setAnswers((p) => ({ ...p, [qId]: optIdx }));
     if (!showSubmit) setShowSubmit(true);
-    log("click");
+    sendLog("click", { question_id: qId, option_index: optIdx });
   };
 
   const handleSubmit = async () => {
@@ -45,7 +60,7 @@ export default function ExerciseCard({ exercise }) {
         timeSpent: Math.round(dwellRef.current / 1000),
       });
       setResult(data);
-      log("submit");
+      sendLog("submit", { answers, time_spent_s: Math.round(dwellRef.current / 1000) });
     } catch {
       alert("Submit failed");
     } finally {
@@ -55,19 +70,43 @@ export default function ExerciseCard({ exercise }) {
 
   const handleRating = async (val) => {
     setRating(val);
-    await setStudySessionRating(result.id, val);
-    log(val);
+
+    const ratingValue = val === "like" ? 1 : -1; // convert to number
+
+    if (result?.id) {
+      await setStudySessionRating(result.id, ratingValue);
+    }
+
+    sendLog(val); // still log "like" or "dislike" as event name
   };
 
-  const log = (type) => console.log(`[METRIC] ${type} - exercise ${exercise.id}`);
 
+  // ---------- Logging helper ----------
+  // sends array with one event (api expects a list)
+  const sendLog = async (eventType = {}) => {
+    const userId = (window.currentUser && window.currentUser.id) ?? null;
+    const payload = [
+      {
+        user_id: userId,
+        item_id: exercise.id,
+        event_type: eventType,
+        event_time: new Date().toISOString()
+      },
+    ];
+    try {
+      await apiPost("/interactions", payload);
+    } catch (err) {
+      console.error("log send failed", err);
+      // optionally buffer or retry
+    }
+  };
+
+  // ---------- Render ----------
   return (
     <div ref={viewRef} className="p-6 text-gray-800">
-      {/* Title + text */}
       <h3 className="text-2xl font-bold mb-3">{exercise.title}</h3>
       <p className="mb-4 whitespace-pre-line">{exercise.content_text}</p>
 
-      {/* Tags */}
       <div className="flex flex-wrap gap-2 mb-6 text-sm">
         <span className="bg-blue-100 px-2 py-1 rounded-full">
           Difficulty: {exercise.difficulty}
@@ -80,7 +119,6 @@ export default function ExerciseCard({ exercise }) {
         </span>
       </div>
 
-      {/* Questions */}
       {!result &&
         exercise.questions.map((q) => (
           <div key={q.id} className="mb-6 p-4 border rounded">
@@ -100,7 +138,6 @@ export default function ExerciseCard({ exercise }) {
           </div>
         ))}
 
-      {/* Submit */}
       {showSubmit && !result && (
         <button
           onClick={handleSubmit}
@@ -111,26 +148,24 @@ export default function ExerciseCard({ exercise }) {
         </button>
       )}
 
-      {/* Result */}
       {result && (
         <div className="mt-6 space-y-4">
           <p className="text-lg font-medium">
             Score: {(result.score * 100).toFixed(0)}%
           </p>
+
           {result.questions.map((q, idx) => (
             <div key={q.id} className="p-4 border rounded bg-gray-50">
               <p className="font-medium">
                 Q{idx + 1}: {q.question_text}
               </p>
               <p>
-                Your answer:{" "}
-                <strong>{q.user_answer}user_answer</strong>{" "}
+                Your answer: <strong>{q.user_answer}</strong>{" "}
                 {q.is_correct ? "(Correct)" : "(Incorrect)"}
               </p>
             </div>
           ))}
 
-          {/* Rating */}
           <div className="mt-6">
             <p className="mb-2">Rate this exercise:</p>
             <div className="flex gap-4">
