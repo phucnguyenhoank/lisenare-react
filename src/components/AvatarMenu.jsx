@@ -4,6 +4,15 @@ import SlideMenu from "./SlideMenu";
 export default function AvatarMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const handleLogout = () => {
+    // Clear auth info from localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+
+    // Optionally refresh UI or redirect
+    window.location.reload();
+  };
+
   return (
     <div className="relative">
       <img
@@ -12,7 +21,11 @@ export default function AvatarMenu() {
         className="w-10 h-10 rounded-full cursor-pointer"
         onClick={() => setMenuOpen(!menuOpen)}
       />
-      <SlideMenu menuOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+      <SlideMenu
+        menuOpen={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        onLogout={handleLogout}
+      />
     </div>
   );
 }
