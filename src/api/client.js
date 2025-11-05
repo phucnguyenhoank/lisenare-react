@@ -6,8 +6,17 @@ async function handleResponse(res) {
     const errorText = await res.text();
     throw new Error(`HTTP ${res.status}: ${errorText}`);
   }
-  return res.json();
+
+  // if response is 204 No Content → just return null
+  if (res.status === 204) return null;
+
+  // sometimes servers send empty 200 OK with no body too
+  const text = await res.text();
+  if (!text) return null;
+
+  return JSON.parse(text);
 }
+
 
 export async function apiGet(endpoint) {
   const res = await fetch(`${BASE_URL}${endpoint}`);

@@ -1,32 +1,61 @@
-import { useEffect, useState, useRef } from "react";
-import { fetchReadings } from "../api/reading";
+// src/pages/ExercisesPage.jsx
+import { useEffect, useState, useRef, useCallback, useLayoutEffect } from "react";
 import ExerciseCard from "../components/ExerciseCard";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
+import { recommendNext } from "../api/recommendation";
 
 export default function ExercisesPage() {
   const [exercises, setExercises] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const swiperRef = useRef(null);
+  const isFetchingRef = useRef(false); // prevents duplicate concurrent fetches
+  const fetchedIdsRef = useRef(new Set()); // keep track of ids already appended
 
-  // Load data
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await fetchReadings();
-        setExercises(data);
-      } catch (e) {
-        setError(e.message);
-      } finally {
+  const loadNext = useCallback(async () => {
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
+    setLoading(true); // Use the state for the loading slide
+
+    try {
+      const username = localStorage.getItem("username") || "";
+      const item = await recommendNext(username);
+
+      if (!item || fetchedIdsRef.current.has(item.id)) {
+        // *** FIX: Reset flags if we return early
+        isFetchingRef.current = false;
         setLoading(false);
+        return;
       }
-    })();
-  }, []);
+      fetchedIdsRef.current.add(item.id);
+      setExercises((prev) => [...prev, item]);
+      // We no longer need the setTimeout and swiper.update() here
+      // useLayoutEffect will handle it.
 
-  // Keyboard navigation
+    } catch (err) {
+      console.error("Failed to fetch recommendation:", err);
+      setError(err.message || String(err));
+      // *** FIX: Also reset on error
+      isFetchingRef.current = false;
+      setLoading(false);
+    } finally {
+      // This will run after the 'try' or 'catch'
+      isFetchingRef.current = false;
+      setLoading(false);
+    }
+  }, []); // Dependencies are correct
+
+
+  // initial load: fetch first exercise
+  useEffect(() => {
+    loadNext();
+  }, [loadNext]);
+
+  // keyboard navigation (keeps previous behavior)
   useEffect(() => {
     const handleKey = (e) => {
       if (!swiperRef.current) return;
@@ -37,8 +66,37 @@ export default function ExercisesPage() {
     return () => window.removeEventListener("keydown", handleKey);
   }, []);
 
-  if (loading) return <p className="p-4">Loading…</p>;
-  if (error) return <p className="p-4 text-red-500">Error: {error}</p>;
+  // ... after your keydown useEffect ...
+
+  // This effect fixes the broken pre-loading chain
+  useLayoutEffect(() => {
+    if (swiperRef.current) {
+      // 1. Update the swiper with the new slides
+      swiperRef.current.update();
+
+      // 2. Manually re-check if we need to load the *next* item
+      const swiper = swiperRef.current;
+      const activeIndex = swiper.activeIndex ?? 0;
+      const totalExercises = exercises.length;
+
+      // 3. Check condition and load if needed
+      if (activeIndex >= totalExercises - 2 && !isFetchingRef.current) {
+        loadNext();
+      }
+    }
+  }, [exercises, loadNext]); // Re-run whenever the exercises array changes
+
+  // handler when slide changes
+  const handleSlideChange = (swiper) => {
+    const activeIndex = swiper.activeIndex ?? 0;
+    // preload when user reaches the second-to-last slide
+    if (activeIndex >= exercises.length - 2) {
+      loadNext();
+    }
+  };
+
+  if (loading && exercises.length === 0) return <p className="p-4">Loading…</p>;
+  if (error && exercises.length === 0) return <p className="p-4 text-red-500">Error: {error}</p>;
 
   return (
     <div className="relative h-screen bg-gray-50">
@@ -48,6 +106,7 @@ export default function ExercisesPage() {
         pagination={{ clickable: true }}
         modules={[Pagination]}
         onSwiper={(swiper) => (swiperRef.current = swiper)}
+        onSlideChange={handleSlideChange}
         className="h-full"
       >
         {exercises.map((ex) => (
@@ -62,10 +121,23 @@ export default function ExercisesPage() {
             </div>
           </SwiperSlide>
         ))}
+
+        {/* Optional: show a loading slide while next item is being fetched */}
+        {isFetchingRef.current && (
+          <SwiperSlide key="loading">
+            <div className="flex justify-center items-center h-full px-4">
+              <div className="w-full max-w-2xl h-[85vh] bg-white rounded-2xl shadow-md overflow-hidden">
+                <div className="h-full flex items-center justify-center">
+                  <p>Loading next exercise…</p>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+        )}
       </Swiper>
 
-      {/* Navigation arrows – only show if more than 1 exercise */}
-      {exercises.length > 1 && (
+      {/* Navigation arrows – only show if > 1 exercise */}
+      {exercises.length > 0 && (
         <>
           <NavButton side="left" onClick={() => swiperRef.current?.slidePrev()} />
           <NavButton side="right" onClick={() => swiperRef.current?.slideNext()} />
