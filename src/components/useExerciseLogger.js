@@ -1,16 +1,14 @@
 // src/components/useExerciseLogger.js
 import { apiPost } from "../api/client";
 
-export default function useExerciseLogger(exerciseId) {
-  const sendLog = async (eventType, extra = {}) => {
-    const userId = (window.currentUser && window.currentUser.id) ?? null;
+export default function useExerciseLogger(userStateId, exerciseId) {
+  const sendLog = async (eventType = {}) => {
     const payload = [
       {
-        user_id: userId,
-        item_id: exerciseId,
         event_type: eventType,
         event_time: new Date().toISOString(),
-        ...extra,
+        user_state_id: userStateId,
+        item_id: exerciseId,
       },
     ];
     try {

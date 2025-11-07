@@ -6,7 +6,7 @@ import ExerciseVisibilityTracker from "./ExerciseVisibilityTracker";
 import useExerciseLogger from "./useExerciseLogger";
 import { submitStudySession, setStudySessionRating } from "../api/studySession";
 
-export default function ExerciseCard({ exercise }) {
+export default function ExerciseCard({ userState, exercise }) {
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
   const [showSubmit, setShowSubmit] = useState(false);
@@ -14,16 +14,16 @@ export default function ExerciseCard({ exercise }) {
   const [rating, setRating] = useState(null);
   const [rerenderKey, setRerenderKey] = useState(0); // 👈 helps reset subcomponents
 
-  const { sendLog } = useExerciseLogger(exercise.id);
+  const { sendLog } = useExerciseLogger(userState.id, exercise.id);
   const { viewRef, dwellRef, reset: resetVisibility } = ExerciseVisibilityTracker({
     onView: () => sendLog("view"),
-    onSkip: (dwell) => sendLog("skip", { dwell_ms: dwell }),
+    onSkip: (dwell) => sendLog("skip"),
   });
 
   const handleSelect = (qId, optIdx) => {
     setAnswers((p) => ({ ...p, [qId]: optIdx }));
     setShowSubmit(true);
-    sendLog("click", { question_id: qId, option_index: optIdx });
+    sendLog("click");
   };
 
   const handleSubmit = async () => {
@@ -35,7 +35,7 @@ export default function ExerciseCard({ exercise }) {
         timeSpent: Math.round(dwellRef.current / 1000),
       });
       setResult(data);
-      sendLog("submit", { answers });
+      sendLog("submit");
     } finally {
       setSubmitting(false);
     }
