@@ -60,7 +60,7 @@ export default function ExercisesPage() {
   if (error && recommendations.length === 0) return <p className="p-4 text-red-500">Error: {error}</p>;
 
   return (
-    <div className="h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100">
       <Swiper
         slidesPerView={1}
         onSwiper={(swiper) => (swiperRef.current = swiper)}
@@ -74,8 +74,8 @@ export default function ExercisesPage() {
       >
         {recommendations.map((rec) => (
           <SwiperSlide key={`${rec.user_state.id}-${rec.item.id}`}>
-            <div className="flex justify-center items-center h-full p-6">
-              <div className="bg-white shadow rounded-xl max-w-2xl w-full h-[85vh] overflow-y-auto p-6">
+            <div className="flex justify-center items-center h-full p-2 md:p-6">
+              <div className="bg-white shadow rounded-xl max-w-md md:max-w-2xl w-full h-full overflow-y-auto p-3 md:p-6">
                 <ExerciseCard userState={rec.user_state} exercise={rec.item} />
               </div>
             </div>
