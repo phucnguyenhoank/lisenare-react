@@ -8,8 +8,8 @@ function App() {
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" element={<ExercisesPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/" element={<ExercisesPage />} />
         <Route path="/my-lessons" element={<h1 className="p-4">You Lessons Will Appear Here</h1>} />
       </Routes>
     </Router>

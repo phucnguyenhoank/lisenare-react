@@ -1,16 +1,16 @@
 import { useState } from "react";
 import SlideMenu from "./SlideMenu";
+import { useNavigate } from "react-router-dom";
 
 export default function AvatarMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     // Clear auth info from localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("username");
-
-    // Optionally refresh UI or redirect
-    window.location.reload();
+    navigate("/register");
   };
 
   return (

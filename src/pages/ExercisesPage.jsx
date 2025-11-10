@@ -66,6 +66,7 @@ export default function ExercisesPage() {
         onSwiper={(swiper) => (swiperRef.current = swiper)}
         onSlideChange={() => {
           if (!swiperRef.current || isFetchingRef.current) return;
+          window.scrollTo({ top: 0, behavior: "smooth" });
           const active = swiperRef.current.activeIndex;
           const unseen = recommendations.length - active - 1;
           if (unseen <= 1) loadBatch();

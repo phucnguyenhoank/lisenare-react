@@ -59,22 +59,27 @@ export default function ExerciseCard({ userState, exercise }) {
     sendLog("retry");
   };
 
+  const levelLabels = ["A1", "A2", "B1", "B2", "C1", "C2"];
+
   return (
     <div ref={viewRef} className="p-6 text-gray-800">
       <h3 className="text-2xl font-bold mb-3">{exercise.title}</h3>
-      <p className="mb-4 whitespace-pre-line">{exercise.content_text}</p>
 
       <div className="flex flex-wrap gap-2 mb-6 text-sm">
         <span className="bg-blue-100 px-2 py-1 rounded-full">
-          Difficulty: {exercise.difficulty}
+          Difficulty: {levelLabels[exercise.difficulty] || "Unknown"}
         </span>
         <span className="bg-green-100 px-2 py-1 rounded-full">
-          Time: {exercise.estimated_time} min
+          Words: {exercise.num_words}
         </span>
         <span className="bg-yellow-100 px-2 py-1 rounded-full">
           Questions: {exercise.num_questions}
         </span>
       </div>
+
+      <p className="mb-4 whitespace-pre-line">{exercise.content_text}</p>
+
+      
 
       {!result && (
         <>
