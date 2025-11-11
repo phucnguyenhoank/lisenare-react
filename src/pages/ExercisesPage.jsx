@@ -69,15 +69,15 @@ export default function ExercisesPage() {
           window.scrollTo({ top: 0, behavior: "smooth" });
           const active = swiperRef.current.activeIndex;
           const unseen = recommendations.length - active - 1;
-          if (unseen <= 1) loadBatch();
+          if (unseen <= 0) loadBatch();
         }}
         className="h-full"
       >
         {recommendations.map((rec) => (
-          <SwiperSlide key={`${rec.user_state.id}-${rec.item.id}`}>
+          <SwiperSlide key={`${rec.recommendation_state.id}-${rec.item.id}`}>
             <div className="flex justify-center items-center h-full p-2 md:p-6">
               <div className="bg-white shadow rounded-xl max-w-md md:max-w-2xl w-full h-full overflow-y-auto p-3 md:p-6">
-                <ExerciseCard userState={rec.user_state} exercise={rec.item} />
+                <ExerciseCard recommendationState={rec.recommendation_state} exercise={rec.item} />
               </div>
             </div>
           </SwiperSlide>

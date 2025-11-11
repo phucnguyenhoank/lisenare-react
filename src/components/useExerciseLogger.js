@@ -1,13 +1,13 @@
 // src/components/useExerciseLogger.js
 import { apiPost } from "../api/client";
 
-export default function useExerciseLogger(userStateId, exerciseId) {
+export default function useExerciseLogger(recommendationStateId, exerciseId) {
   const sendLog = async (eventType = {}) => {
     const payload = [
       {
         event_type: eventType,
         event_time: new Date().toISOString(),
-        user_state_id: userStateId,
+        recommendation_state_id: recommendationStateId,
         item_id: exerciseId,
       },
     ];

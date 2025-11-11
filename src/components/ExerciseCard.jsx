@@ -6,7 +6,7 @@ import ExerciseVisibilityTracker from "./ExerciseVisibilityTracker";
 import useExerciseLogger from "./useExerciseLogger";
 import { submitStudySession, setStudySessionRating } from "../api/studySession";
 
-export default function ExerciseCard({ userState, exercise }) {
+export default function ExerciseCard({ recommendationState, exercise }) {
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
   const [showSubmit, setShowSubmit] = useState(false);
@@ -14,7 +14,7 @@ export default function ExerciseCard({ userState, exercise }) {
   const [rating, setRating] = useState(null);
   const [rerenderKey, setRerenderKey] = useState(0); // 👈 helps reset subcomponents
 
-  const { sendLog } = useExerciseLogger(userState.id, exercise.id);
+  const { sendLog } = useExerciseLogger(recommendationState.id, exercise.id);
   const { viewRef, dwellRef, reset: resetVisibility } = ExerciseVisibilityTracker({
     onView: () => sendLog("view"),
     onSkip: (dwell) => sendLog("skip"),
@@ -23,7 +23,6 @@ export default function ExerciseCard({ userState, exercise }) {
   const handleSelect = (qId, optIdx) => {
     setAnswers((p) => ({ ...p, [qId]: optIdx }));
     setShowSubmit(true);
-    sendLog("click");
   };
 
   const handleSubmit = async () => {
@@ -56,7 +55,6 @@ export default function ExerciseCard({ userState, exercise }) {
     setRating(null);
     resetVisibility();
     setRerenderKey((k) => k + 1); // force re-render ExerciseQuestions
-    sendLog("retry");
   };
 
   const levelLabels = ["A1", "A2", "B1", "B2", "C1", "C2"];
