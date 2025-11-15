@@ -1,4 +1,3 @@
-// src/pages/RegisterPage.jsx
 import UserRegisterForm from "../components/UserRegisterForm";
 
 export default function RegisterPage() {

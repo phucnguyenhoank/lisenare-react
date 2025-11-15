@@ -1,4 +1,4 @@
-// src\api\client.js
+// src/api/client.js
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 async function handleResponse(res) {
@@ -7,46 +7,27 @@ async function handleResponse(res) {
     throw new Error(`HTTP ${res.status}: ${errorText}`);
   }
 
-  // No content case (204 or empty body)
   const text = await res.text();
   if (!text) return null;
 
-  return JSON.parse(text);
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    return text; // fallback to raw text if not JSON
+  }
 }
 
-export async function apiGet(endpoint) {
-  const res = await fetch(`${BASE_URL}${endpoint}`);
-  return handleResponse(res);
-}
+export async function apiCall(endpoint, method = 'GET', data = null, headers = {}) {
+  // Default to JSON, overiden by any custom headers
+  const defaultHeaders = { 'Content-Type': 'application/json' };
+  const options = {
+    method,
+    headers: { ...defaultHeaders, ...headers },
+  };
 
-export async function apiPost(endpoint, data) {
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(res);
-}
+  // Allow sending JSON, form-encoded, or raw bodies
+  if (data) options.body = data instanceof URLSearchParams ? data : JSON.stringify(data);
 
-export async function apiPut(endpoint, data) {
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-  return handleResponse(res);
-}
-
-export async function apiDelete(endpoint) {
-  const res = await fetch(`${BASE_URL}${endpoint}`, { method: "DELETE" });
-  return handleResponse(res);
-}
-
-export async function apiPatch(endpoint, data) {
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+  const res = await fetch(`${BASE_URL}${endpoint}`, options);
   return handleResponse(res);
 }

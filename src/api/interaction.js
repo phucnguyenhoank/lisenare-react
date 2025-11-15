@@ -1,11 +1,18 @@
 // src/api/interaction.js
-export async function logInteraction(payload) {
-  // Replace with your real endpoint
-  const res = await fetch("/api/interactions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+import { apiCall } from './client';
 
-  if (!res.ok) throw new Error("Failed to log interaction");
+export async function updateEvent(study_session_id, event_type) {
+  return apiCall(
+    `/study_sessions/${study_session_id}/event`,
+    'PATCH',
+    { event_type } // shorthand for { event_type: event_type }
+  );
+}
+
+export async function submmitAnswer(study_session_id, user_answer) {
+  return apiCall(
+    `/study_sessions/${study_session_id}/submit`,
+    'PATCH',
+    { user_answer }
+  );
 }

@@ -1,6 +1,9 @@
 // src/api/recommendation.js
-import { apiPost } from "./client";
+import { apiCall } from "./client";
 
-export async function recommendNext(username) {
-  return apiPost("/recommendation/recommend", {username});
+export async function getRecommendedItems(username, batch_size) {
+  const params = new URLSearchParams({ username });
+  if (batch_size) params.append("batch_size", batch_size);
+
+  return apiCall(`/recommendation/recommend?${params.toString()}`, "POST");
 }

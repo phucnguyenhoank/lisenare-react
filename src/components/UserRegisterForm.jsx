@@ -20,6 +20,7 @@ export default function UserRegisterForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3 max-w-sm">
+      
       <input
         type="text"
         placeholder="Enter username"
@@ -28,9 +29,11 @@ export default function UserRegisterForm() {
         required
         className="border p-2 rounded"
       />
+
       <button type="submit" className="bg-blue-600 text-white p-2 rounded">
         Register / Login
       </button>
+
       <p>{message}</p>
     </form>
   );

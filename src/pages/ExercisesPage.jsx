@@ -1,7 +1,7 @@
 // src/pages/ExercisesPage.jsx
 import { useEffect, useState, useRef } from "react";
 import ExerciseCard from "../components/ExerciseCard";
-import { recommendNext } from "../api/recommendation";
+import { getRecommendedItems } from "../api/recommendation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 
@@ -13,7 +13,6 @@ export default function ExercisesPage() {
   const swiperRef = useRef(null);
   const isFetchingRef = useRef(false);
 
-  // Load batch of 3
   async function loadBatch() {
     if (isFetchingRef.current) return;
     isFetchingRef.current = true;
@@ -22,20 +21,15 @@ export default function ExercisesPage() {
     setError(null);
 
     try {
-      const username = localStorage.getItem("username") || "";
-      const batch = await recommendNext(username);
-
-      if (!Array.isArray(batch) || batch.length === 0) {
-        throw new Error("Empty batch");
-      }
-
+      const username = localStorage.getItem("username");
+      const batch = await getRecommendedItems(username);
       setRecommendations((prev) => [...prev, ...batch]);
     } catch (err) {
       console.error(err);
-      setError(err.message || "Failed");
+      setError(err.message);
     } finally {
       isFetchingRef.current = false;
-      setLoading(false); // Safe: loading slide stays until next render
+      setLoading(false);
     }
   }
 
@@ -56,7 +50,7 @@ export default function ExercisesPage() {
   }, []);
 
   // Early UI
-  if (loading && recommendations.length === 0) return <p className="p-4">Loading…</p>;
+  if (loading && recommendations.length === 0) return <p className="p-4">Loading...</p>;
   if (error && recommendations.length === 0) return <p className="p-4 text-red-500">Error: {error}</p>;
 
   return (
@@ -74,10 +68,10 @@ export default function ExercisesPage() {
         className="h-full"
       >
         {recommendations.map((rec) => (
-          <SwiperSlide key={`${rec.recommendation_state.id}-${rec.item.id}`}>
+          <SwiperSlide key={`${rec.study_session_id.id}-${rec.item.id}`}>
             <div className="flex justify-center items-center h-full p-2 md:p-6">
               <div className="bg-white shadow rounded-xl max-w-md md:max-w-2xl w-full h-full overflow-y-auto p-3 md:p-6">
-                <ExerciseCard recommendationState={rec.recommendation_state} exercise={rec.item} />
+                <ExerciseCard studySessionId={rec.study_session_id} exercise={rec.item} />
               </div>
             </div>
           </SwiperSlide>

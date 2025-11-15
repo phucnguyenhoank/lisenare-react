@@ -1,5 +1,5 @@
 // src/api/users.js
-import { apiPost } from "./client";
+import { apiCall } from "./client";
 import { loginUser } from "./auth";
 
 export async function registerOrLogin(username) {
@@ -15,13 +15,13 @@ export async function registerOrLogin(username) {
   let justRegistered = false;
 
   try {
-    await apiPost("/users/", payload);
+    await apiCall("/users/", "POST", payload);
     justRegistered = true;
     console.log("✅ Registered successfully, now logging in...");
   } catch (err) {
     // only ignore "already exists" errors
     if (err.message.includes("already") || err.message.includes("409")) {
-      console.log("ℹ️ User already exists, logging in...");
+      console.log("User already exists, logging in...");
     } else {
       throw err; // rethrow other real errors
     }
