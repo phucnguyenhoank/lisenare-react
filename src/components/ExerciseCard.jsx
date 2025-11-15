@@ -21,8 +21,8 @@ export default function ExerciseCard({ studySessionId, exercise }) {
     try {
       const ordered = exercise.questions.map((q) => answers[q.id] ?? -1);
       const user_answer = ordered.join(",");
-      const data = await submitAnswer(studySessionId, user_answer);
-      setResult(data);
+      const updated_study_session = await submitAnswer(studySessionId, user_answer);
+      setResult(updated_study_session);
     } catch (err) {
       alert(`Submit failed: ${err.message}`);
     } finally {
@@ -42,7 +42,7 @@ export default function ExerciseCard({ studySessionId, exercise }) {
       <ResultCard
         exercise={exercise}
         answers={answers}
-        result={result}
+        studySessionId={studySessionId}
         onRetry={handleRetry}
       />
     );

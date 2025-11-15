@@ -1,4 +1,8 @@
-export default function ResultCard({ exercise, answers, result, onRetry }) {
+import { useState } from "react";
+import { updateEvent } from "../api/interaction";
+import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
+
+export default function ResultCard({ exercise, answers, studySessionId, onRetry }) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 
   const total = exercise.questions.length;
@@ -8,6 +12,21 @@ export default function ResultCard({ exercise, answers, result, onRetry }) {
     return acc + (userIdx === q.correct_option ? 1 : 0);
   }, 0);
 
+  const [feedbackSent, setFeedbackSent] = useState(false);
+  const [feedbackType, setFeedbackType] = useState(null); // 'like' or 'dislike'
+
+  const handleFeedback = async (type) => {
+    if (feedbackSent) return;
+    setFeedbackType(type);
+    setFeedbackSent(true);
+
+    // send event to server
+    try {
+      await updateEvent(studySessionId, type); // using exercise.id as study_session_id
+    } catch (err) {
+      console.error("Failed to send feedback:", err);
+    }
+  };
 
   return (
     <div className="p-6 text-gray-800 space-y-6">
@@ -48,31 +67,19 @@ export default function ResultCard({ exercise, answers, result, onRetry }) {
                   : "border-red-500 bg-red-50"
               }`}
             >
-              {/* Question */}
               <p className="font-semibold text-gray-900 mb-1">
                 Question {i + 1}: {q.question_text}
               </p>
-
-              {/* User answer */}
-              <p
-                className={`${
-                  isCorrect ? "text-green-700" : "text-red-700"
-                } mt-1`}
-              >
-                <strong>Your answer:</strong>{" "}
-                {userAnswerLabel}. {userAnswerText}
+              <p className={`${isCorrect ? "text-green-700" : "text-red-700"} mt-1`}>
+                <strong>Your answer:</strong> {userAnswerLabel}. {userAnswerText}
               </p>
 
-              {/* Correct answer (only show if wrong) */}
               {!isCorrect && (
                 <>
                   <p className="text-gray-800 mt-1">
-                    <strong>Correct answer:</strong>{" "}
-                    {correctAnswerLabel}. {correctAnswerText}
+                    <strong>Correct answer:</strong> {correctAnswerLabel}. {correctAnswerText}
                   </p>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {q.explanation}
-                  </p>
+                  <p className="text-sm text-gray-600 mt-1">{q.explanation}</p>
                 </>
               )}
             </div>
@@ -80,10 +87,34 @@ export default function ResultCard({ exercise, answers, result, onRetry }) {
         })}
       </div>
 
+      {/* Like/Dislike buttons */}
+      <div className="flex items-center gap-4 mt-4">
+        {!feedbackSent ? (
+          <>
+            <button
+              onClick={() => handleFeedback("like")}
+              className="flex items-center justify-center w-10 h-10 text-green-600 border border-green-600 rounded-full hover:bg-green-50 transition-opacity duration-500"
+            >
+              <FaThumbsUp />
+            </button>
+            <button
+              onClick={() => handleFeedback("dislike")}
+              className="flex items-center justify-center w-10 h-10 text-red-600 border border-red-600 rounded-full hover:bg-red-50 transition-opacity duration-500"
+            >
+              <FaThumbsDown />
+            </button>
+          </>
+        ) : (
+          <p className="text-gray-700">
+            Thanks for your feedback! You selected <strong>{feedbackType}</strong>.
+          </p>
+        )}
+      </div>
+
       {/* Retry */}
       <button
         onClick={onRetry}
-        className="w-full bg-emerald-500 text-white px-5 py-2 rounded hover:bg-emerald-600 font-medium"
+        className="w-full bg-emerald-500 text-white px-5 py-2 rounded hover:bg-emerald-600 font-medium mt-4"
       >
         Try Again
       </button>
