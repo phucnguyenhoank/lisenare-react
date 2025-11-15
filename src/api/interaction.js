@@ -9,10 +9,11 @@ export async function updateEvent(study_session_id, event_type) {
   );
 }
 
-export async function submmitAnswer(study_session_id, user_answer) {
+export async function submitAnswer(study_session_id, user_answer) {
   return apiCall(
     `/study_sessions/${study_session_id}/submit`,
     'PATCH',
     { user_answer }
   );
 }
+
