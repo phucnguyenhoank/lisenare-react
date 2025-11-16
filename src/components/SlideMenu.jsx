@@ -20,6 +20,13 @@ export default function SlideMenu({ menuOpen, onClose, onLogout }) {
             My Lessons
           </Link>
         </li>
+
+        <li>
+          <Link to="/writing-check" className="hover:text-blue-600" onClick={onClose}>
+            Writing Check
+          </Link>
+        </li>
+
         <li>
           <button
             onClick={() => {
