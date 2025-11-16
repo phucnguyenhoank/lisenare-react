@@ -4,11 +4,10 @@ import { getRecommendedItems } from "../api/recommendation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { updateEvent } from "../api/interaction";
-import { useNavigate } from "react-router-dom";
 
 
 export default function ExercisesPage() {
-  const navigate = useNavigate();
+
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -61,6 +60,9 @@ export default function ExercisesPage() {
 
   // ---- Slide change handler ----
   const handleSlideChange = (swiper) => {
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
     const newIndex = swiper.activeIndex;
     const prevCard = activeCardRef.current;
     const prevStart = startTimeRef.current;
@@ -108,7 +110,7 @@ export default function ExercisesPage() {
     return <p className="p-4 text-red-500">Error: {error}</p>;
 
   return (
-    <div className="bg-gray-100">
+    <div className="bg-gray-100 p-2 md:p-6">
       <Swiper
         slidesPerView={1}
         onSwiper={(swiper) => {
@@ -130,11 +132,12 @@ export default function ExercisesPage() {
           }
         }}
         onSlideChange={handleSlideChange}
-        className="h-screen"
+        className="w-full"
+        autoHeight={true}
       >
         {recommendations.map((rec) => (
           <SwiperSlide key={`${rec.study_session_id}-${rec.item.id}`}>
-            <div className="flex justify-center items-start h-full p-2 md:p-6 overflow-y-auto">
+            <div className="flex justify-center w-full">
               <div className="bg-white shadow rounded-xl max-w-md md:max-w-2xl w-full p-3 md:p-6">
                 <ExerciseCard
                   studySessionId={rec.study_session_id}
@@ -147,14 +150,14 @@ export default function ExercisesPage() {
 
         {loading && (
           <SwiperSlide key="loading">
-            <div className="flex justify-center items-center h-full p-6">
+            <div className="flex justify-center items-center w-full p-6">
               <p>Loading next batch...</p>
             </div>
           </SwiperSlide>
         )}
       </Swiper>
 
-      <div className="absolute bottom-4 right-4 text-sm text-gray-600">
+      <div className="mt-4 text-sm text-gray-600 text-right">
         Items: {recommendations.length}
         {loading ? " | Loading..." : ""}
       </div>
