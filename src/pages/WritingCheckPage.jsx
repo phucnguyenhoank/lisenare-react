@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { checkWriting } from "../api/writing";
-import DiffMatchPatch from 'diff-match-patch';
+import DiffMatchPatch from "diff-match-patch";
 
 const dmp = new DiffMatchPatch();
 
@@ -9,34 +9,40 @@ export default function WritingCheckPage() {
   const [editedText, setEditedText] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [style, setStyle] = useState("neutral"); // default
 
-  // Compute word-level patches
+  // map UI option → API instruction
+  const stylePrompts = {
+    formal: "Write this more formally",
+    neutral: "Fix the grammar",
+    informal: "Write this more informally",
+  };
+
   const computeSuggestions = useCallback((original, edited) => {
-    // Use WORD mode for human-friendly suggestions
-    dmp.Diff_EditCost = 4; // default
+    dmp.Diff_EditCost = 4;
     const diffs = dmp.diff_main(original, edited);
-    dmp.diff_cleanupSemantic(diffs); // merge nearby changes
+    dmp.diff_cleanupSemantic(diffs);
 
     const patches = dmp.patch_make(original, diffs);
     return patches.map((patch, idx) => {
       const start = patch.start1;
       const end = start + patch.length1;
       const originalText = patch.diffs
-        .filter(d => d[0] === -1)
-        .map(d => d[1])
-        .join('');
+        .filter((d) => d[0] === -1)
+        .map((d) => d[1])
+        .join("");
       const replacementText = patch.diffs
-        .filter(d => d[0] === 1)
-        .map(d => d[1])
-        .join('');
+        .filter((d) => d[0] === 1)
+        .map((d) => d[1])
+        .join("");
 
       return {
         id: `patch-${idx}-${start}`,
-        originalText: originalText || '(remove)',
-        replacementText: replacementText || '(insert)',
+        originalText: originalText || "(remove)",
+        replacementText: replacementText || "(insert)",
         start,
         end,
-        patch, // keep full patch for apply
+        patch,
       };
     });
   }, []);
@@ -44,7 +50,8 @@ export default function WritingCheckPage() {
   const handleCheck = async () => {
     setLoading(true);
     try {
-      const resp = await checkWriting("Fix the grammar", text);
+      const prompt = stylePrompts[style];
+      const resp = await checkWriting(prompt, text);
       const edited = resp?.edited_text ?? "";
       setEditedText(edited);
       const newSuggestions = computeSuggestions(text, edited);
@@ -57,34 +64,51 @@ export default function WritingCheckPage() {
     }
   };
 
-  const applySuggestion = useCallback((id) => {
-    const sug = suggestions.find(s => s.id === id);
-    if (!sug) return;
+  const applySuggestion = useCallback(
+    (id) => {
+      const sug = suggestions.find((s) => s.id === id);
+      if (!sug) return;
 
-    const [newText] = dmp.patch_apply([sug.patch], text);
-    setText(newText);
+      const [newText] = dmp.patch_apply([sug.patch], text);
+      setText(newText);
 
-    // Recompute remaining suggestions
-    const remaining = suggestions.filter(s => s.id !== id);
-    const updatedPatches = remaining.map(s => s.patch);
-    const stillValidPatches = updatedPatches.filter(patch => {
-      const [_, success] = dmp.patch_apply([patch], newText);
-      return success;
-    });
+      // recompute remaining valid patches
+      const remaining = suggestions.filter((s) => s.id !== id);
+      const stillValid = remaining
+        .map((s) => s.patch)
+        .filter((patch) => {
+          const [, success] = dmp.patch_apply([patch], newText);
+          return success;
+        });
 
-    const newSuggestions = stillValidPatches.map((patch, idx) => {
-      const start = patch.start1;
-      const end = start + patch.length1;
-      const originalText = patch.diffs.filter(d => d[0] === -1).map(d => d[1]).join('');
-      const replacementText = patch.diffs.filter(d => d[0] === 1).map(d => d[1]).join('');
-      return { id: `re-${idx}`, originalText, replacementText, start, end, patch };
-    });
+      const newSugs = stillValid.map((patch, idx) => {
+        const start = patch.start1;
+        const end = start + patch.length1;
+        const originalText = patch.diffs
+          .filter((d) => d[0] === -1)
+          .map((d) => d[1])
+          .join("");
+        const replacementText = patch.diffs
+          .filter((d) => d[0] === 1)
+          .map((d) => d[1])
+          .join("");
+        return {
+          id: `re-${idx}`,
+          originalText,
+          replacementText,
+          start,
+          end,
+          patch,
+        };
+      });
 
-    setSuggestions(newSuggestions);
-  }, [suggestions, text]);
+      setSuggestions(newSugs);
+    },
+    [suggestions, text]
+  );
 
   const skipSuggestion = useCallback((id) => {
-    setSuggestions(prev => prev.filter(s => s.id !== id));
+    setSuggestions((prev) => prev.filter((s) => s.id !== id));
   }, []);
 
   const applyAll = () => {
@@ -95,7 +119,6 @@ export default function WritingCheckPage() {
 
   const skipAll = () => setSuggestions([]);
 
-  // Inline preview: highlight current suggestions
   const inlinePreview = useMemo(() => {
     if (!suggestions.length) return [{ text, type: "plain" }];
 
@@ -107,7 +130,11 @@ export default function WritingCheckPage() {
       if (pos < sug.start) {
         fragments.push({ text: text.slice(pos, sug.start), type: "plain" });
       }
-      fragments.push({ text: text.slice(sug.start, sug.end), type: "suggestion", id: sug.id });
+      fragments.push({
+        text: text.slice(sug.start, sug.end),
+        type: "suggestion",
+        id: sug.id,
+      });
       pos = sug.end;
     }
     if (pos < text.length) {
@@ -119,16 +146,22 @@ export default function WritingCheckPage() {
   return (
     <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Check Your Writing</h1>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* ---- LEFT PANEL ---- */}
         <div className="lg:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Your text</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Your text
+          </label>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             className="w-full p-3 border rounded-md h-48 resize-y"
             placeholder="Type your paragraph here..."
           />
-          <div className="flex items-center gap-2 mt-3">
+
+          {/* Controls */}
+          <div className="flex items-center gap-2 mt-3 flex-wrap">
             <button
               onClick={handleCheck}
               disabled={loading}
@@ -136,6 +169,18 @@ export default function WritingCheckPage() {
             >
               {loading ? "Checking..." : "Check"}
             </button>
+
+            {/* Style selector */}
+            <select
+              value={style}
+              onChange={(e) => setStyle(e.target.value)}
+              className="px-3 py-2 border rounded-md text-sm"
+            >
+              <option value="neutral">Neutral</option>
+              <option value="formal">Formal</option>
+              <option value="informal">Informal</option>
+            </select>
+
             <button
               onClick={applyAll}
               disabled={!editedText || text === editedText}
@@ -150,21 +195,25 @@ export default function WritingCheckPage() {
             >
               Skip All
             </button>
+
             <div className="ml-auto text-sm text-gray-500">
               Suggestions: {suggestions.length}
             </div>
           </div>
 
-          {/* Preview */}
+          {/* Inline preview */}
           <div className="mt-4">
-            <div className="text-sm text-gray-600 mb-1">Preview (changes highlighted)</div>
+            <div className="text-sm text-gray-600 mb-1">
+              Preview (changes highlighted)
+            </div>
             <div className="p-3 border rounded-md bg-white min-h-[120px] whitespace-pre-wrap">
               {inlinePreview.map((frag, i) => (
                 <span
                   key={i}
-                  className={frag.type === "suggestion"
-                    ? "bg-yellow-100 border border-yellow-300 px-0.5 rounded-sm"
-                    : ""
+                  className={
+                    frag.type === "suggestion"
+                      ? "bg-yellow-100 border border-yellow-300 px-0.5 rounded-sm"
+                      : ""
                   }
                   title={frag.type === "suggestion" ? "Suggested change" : ""}
                 >
@@ -175,29 +224,39 @@ export default function WritingCheckPage() {
           </div>
         </div>
 
-        {/* Suggestions Panel */}
+        {/* ---- RIGHT PANEL (Suggestions) ---- */}
         <aside className="bg-gray-50 border rounded-md p-3">
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-semibold">Suggestions</h2>
             <div className="text-xs text-gray-500">Click Apply to accept</div>
           </div>
+
           {suggestions.length === 0 ? (
-            <div className="text-sm text-gray-500">No suggestions — click Check.</div>
+            <div className="text-sm text-gray-500">
+              No suggestions — click Check.
+            </div>
           ) : (
             <div className="space-y-3 max-h-[60vh] overflow-auto pr-2">
               {suggestions.map((sug) => (
-                <div key={sug.id} className="p-3 bg-white border rounded-md text-sm">
+                <div
+                  key={sug.id}
+                  className="p-3 bg-white border rounded-md text-sm"
+                >
                   <div className="flex gap-3">
                     <div className="flex-1">
                       <div className="text-xs text-gray-500">Original</div>
                       <div className="p-2 bg-red-50 border rounded mt-1 font-medium">
                         {sug.originalText || <em>(remove)</em>}
                       </div>
-                      <div className="text-xs text-gray-500 mt-2">Suggestion</div>
+
+                      <div className="text-xs text-gray-500 mt-2">
+                        Suggestion
+                      </div>
                       <div className="p-2 bg-green-50 border rounded mt-1 font-medium">
                         {sug.replacementText || <em>(insert)</em>}
                       </div>
                     </div>
+
                     <div className="flex flex-col gap-1.5">
                       <button
                         onClick={() => applySuggestion(sug.id)}
@@ -221,7 +280,7 @@ export default function WritingCheckPage() {
       </div>
 
       <div className="mt-6 text-xs text-gray-500">
-        Powered by <code>diff-match-patch</code> — smarter, shorter, battle-tested.
+        Powered by <code>diff-match-patch</code>.
       </div>
     </div>
   );
