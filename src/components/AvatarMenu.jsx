@@ -1,11 +1,11 @@
 import { useState } from "react";
 import SlideMenu from "./SlideMenu";
+import { FaBars } from "react-icons/fa";
 
 export default function AvatarMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
-    // Clear auth info from localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("username");
     window.location.href = "/register";
@@ -13,10 +13,8 @@ export default function AvatarMenu() {
 
   return (
     <div className="relative">
-      <img
-        src="https://i.pravatar.cc/40"
-        alt="avatar"
-        className="w-10 h-10 rounded-full cursor-pointer"
+      <FaBars 
+        className="w-6 h-6 text-gray-800 cursor-pointer hover:text-gray-600 transition"
         onClick={() => setMenuOpen(!menuOpen)}
       />
       <SlideMenu

@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { updateEvent } from "../api/interaction";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
 export default function ResultCard({ exercise, answers, studySessionId, onRetry }) {
-  window.scrollTo({ top: 0, behavior: "smooth" });
 
   const total = exercise.questions.length;
 
@@ -14,6 +13,11 @@ export default function ResultCard({ exercise, answers, studySessionId, onRetry 
 
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [feedbackType, setFeedbackType] = useState(null); // 'like' or 'dislike'
+
+  // Scroll to top on first render
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   const handleFeedback = async (type) => {
     if (feedbackSent) return;

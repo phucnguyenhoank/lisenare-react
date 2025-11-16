@@ -4,8 +4,11 @@ import { getRecommendedItems } from "../api/recommendation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { updateEvent } from "../api/interaction";
+import { useNavigate } from "react-router-dom";
+
 
 export default function ExercisesPage() {
+  const navigate = useNavigate();
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,7 +31,8 @@ export default function ExercisesPage() {
     setError(null);
 
     try {
-      const username = localStorage.getItem("username");
+      const username = localStorage.getItem("username") || "anonymous";
+
       const batch = await getRecommendedItems(username);
       setRecommendations((prev) => [...prev, ...batch]);
     } catch (err) {
@@ -88,7 +92,6 @@ export default function ExercisesPage() {
     const unseen = recommendations.length - newIndex - 1;
     if (unseen <= 0) loadBatch();
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // ---- Cleanup timer on unmount ----
@@ -105,7 +108,7 @@ export default function ExercisesPage() {
     return <p className="p-4 text-red-500">Error: {error}</p>;
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="bg-gray-100">
       <Swiper
         slidesPerView={1}
         onSwiper={(swiper) => {
@@ -127,12 +130,12 @@ export default function ExercisesPage() {
           }
         }}
         onSlideChange={handleSlideChange}
-        className="h-full"
+        className="h-screen"
       >
         {recommendations.map((rec) => (
-          <SwiperSlide key={`${rec.study_session_id.id}-${rec.item.id}`}>
-            <div className="flex justify-center items-center h-full p-2 md:p-6">
-              <div className="bg-white shadow rounded-xl max-w-md md:max-w-2xl w-full h-full overflow-y-auto p-3 md:p-6">
+          <SwiperSlide key={`${rec.study_session_id}-${rec.item.id}`}>
+            <div className="flex justify-center items-start h-full p-2 md:p-6 overflow-y-auto">
+              <div className="bg-white shadow rounded-xl max-w-md md:max-w-2xl w-full p-3 md:p-6">
                 <ExerciseCard
                   studySessionId={rec.study_session_id}
                   exercise={rec.item}
@@ -145,7 +148,7 @@ export default function ExercisesPage() {
         {loading && (
           <SwiperSlide key="loading">
             <div className="flex justify-center items-center h-full p-6">
-              <p>Loading next batch…</p>
+              <p>Loading next batch...</p>
             </div>
           </SwiperSlide>
         )}
@@ -153,7 +156,7 @@ export default function ExercisesPage() {
 
       <div className="absolute bottom-4 right-4 text-sm text-gray-600">
         Items: {recommendations.length}
-        {loading ? " | Loading…" : ""}
+        {loading ? " | Loading..." : ""}
       </div>
     </div>
   );
