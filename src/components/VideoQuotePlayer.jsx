@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import { FaArrowLeft, FaArrowRight, FaRedo } from 'react-icons/fa';
 
-export default function VideoQuotePlayer({ quotes }) {
+export default function VideoQuotePlayer({ quotes, query }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const iframeRef = useRef(null);
 
@@ -29,6 +29,19 @@ export default function VideoQuotePlayer({ quotes }) {
     }
   };
 
+  // Highlight query words in the text
+  const getHighlightedText = (text, query) => {
+    if (!query) return text;
+    const words = query.trim().split(/\s+/).filter(Boolean);
+    if (words.length === 0) return text;
+    const regex = new RegExp(`(${words.map(w => escapeRegExp(w)).join('|')})`, 'gi');
+    return text.split(regex).map((part, i) =>
+      regex.test(part) ? (
+        <span key={i} className="bg-yellow-200 rounded px-1">{part}</span>
+      ) : part
+    );
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-200">
       <div className="text-center mb-4">
@@ -36,7 +49,7 @@ export default function VideoQuotePlayer({ quotes }) {
           Quote {currentIndex + 1} of {quotes.length}
         </h3>
         <p className="text-base text-gray-600 mt-2 italic leading-relaxed max-w-3xl mx-auto">
-          "{current.text}"
+          "{getHighlightedText(current.text, query)}"
         </p>
         <p className="text-sm text-gray-500 mt-1">Timestamp: {formatTime(startTime)}</p>
       </div>
@@ -88,4 +101,9 @@ function formatTime(seconds) {
   if (h > 0) return `${h}h ${m}m ${s}s`;
   if (m > 0) return `${m}m ${s}s`;
   return `${s}s`;
+}
+
+// Escape regex special characters in query words
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

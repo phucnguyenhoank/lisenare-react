@@ -53,7 +53,13 @@ export default function ContextSearchPage() {
           <div className="text-red-600 text-center font-medium mb-4">{error}</div>
         )}
 
-        {results.length > 0 && <VideoQuotePlayer quotes={results} />}
+        {!loading && results.length === 0 && query.trim() && (
+          <div className="text-gray-700 text-center font-medium mt-4">
+            Sorry, no quotes found for your query.
+          </div>
+        )}
+
+        {results.length > 0 && <VideoQuotePlayer quotes={results} query={query} />}
       </div>
     </div>
   );
