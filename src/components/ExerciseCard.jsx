@@ -1,8 +1,8 @@
 // src/components/ExerciseCard.jsx
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import ExerciseQuestions from "./ExerciseQuestions";
 import ResultCard from "./ResultCard";
-import { submitAnswer, updateEvent } from "../api/interaction";
+import { submitAnswer } from "../api/interaction";
 
 export default function ExerciseCard({ studySessionId, exercise }) {
   const [answers, setAnswers] = useState({});
