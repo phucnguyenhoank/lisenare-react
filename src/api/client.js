@@ -29,5 +29,6 @@ export async function apiCall(endpoint, method = 'GET', data = null, headers = {
   if (data) options.body = data instanceof URLSearchParams ? data : JSON.stringify(data);
 
   const res = await fetch(`${BASE_URL}${endpoint}`, options);
+  console.log(data)
   return handleResponse(res);
 }

@@ -34,6 +34,12 @@ export default function SlideMenu({ menuOpen, onClose, onLogout }) {
         </li>
 
         <li>
+          <Link to="/profile" className="hover:text-blue-600" onClick={onClose}>
+            Profile
+          </Link>
+        </li>
+
+        <li>
           <button
             onClick={() => {
               onLogout();

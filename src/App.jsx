@@ -6,7 +6,9 @@ import Navbar from "./components/Navbar";
 import WritingCheckPage from "./pages/WritingCheckPage";
 import ContextSearchPage from "./pages/ContextSearchPage";
 import LoginPage from "./pages/LoginPage";
+import ProfilePage from "./pages/ProfilePage";
 import { UserProvider } from "./contexts/UserContext";
+import ForgotPasswordPage from "./components/ForgotPasswordPage";
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
           <Route path="/saved-lessons" element={<h1 className="p-4">You Lessons Will Appear Here</h1>} />
           <Route path="/writing-check" element={<WritingCheckPage />} />
           <Route path="/context-search" element={<ContextSearchPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/forgot" element={<ForgotPasswordPage />} />
         </Routes>
       </Router>
     </UserProvider>

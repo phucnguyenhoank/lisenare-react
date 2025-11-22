@@ -6,6 +6,7 @@ import { UserContext } from "../contexts/UserContext";
 
 export default function Navbar() {
   const { username } = useContext(UserContext);
+  console.log("NavBar" + username);
 
   return (
     <nav className="w-full bg-white shadow-md">
@@ -24,7 +25,7 @@ export default function Navbar() {
             </span>
           ) : (
             <Link to="/login" className="text-blue-600 font-medium">
-              Login / Register
+              {/* Login / Register */}
             </Link>
           )}
           <HamburgerMenu />

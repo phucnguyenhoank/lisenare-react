@@ -68,6 +68,13 @@ export default function LoginPage() {
         Register
       </button>
 
+      <button
+        className="text-blue-600 underline p-2 rounded"
+        onClick={() => navigate("/forgot")}
+      >
+        Forgot your password?
+      </button>
+
       {message && <p className="text-center">{message}</p>}
     </div>
   );
