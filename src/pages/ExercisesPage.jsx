@@ -1,12 +1,19 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import ExerciseCard from "../components/ExerciseCard";
 import { getRecommendedItems } from "../api/recommendation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { updateEvent } from "../api/interaction";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
+
+
+const TIME_TO_VIEW = Number(import.meta.env.VITE_TIME_TO_VIEW) || 3000;
 
 
 export default function ExercisesPage() {
+  const { username } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,10 +37,12 @@ export default function ExercisesPage() {
     setError(null);
 
     try {
-      const username = localStorage.getItem("username") || "anonymous";
-
+      if (!username) {
+        navigate("/login");
+      }
       const batch = await getRecommendedItems(username);
       setRecommendations((prev) => [...prev, ...batch]);
+
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -70,7 +79,7 @@ export default function ExercisesPage() {
     // ---- Handle previous card ----
     if (prevCard && !viewSentRef.current) {
       const timeSpent = Date.now() - prevStart;
-      if (timeSpent < 4000) {
+      if (timeSpent < TIME_TO_VIEW) {
         updateEvent(prevCard, "skip");
       }
     }
@@ -81,14 +90,13 @@ export default function ExercisesPage() {
     viewSentRef.current = false;
     startTimeRef.current = Date.now();
 
-    // schedule 'view' after 5s
     if (viewTimerRef.current) clearTimeout(viewTimerRef.current);
     viewTimerRef.current = setTimeout(() => {
       if (!viewSentRef.current && newCard) {
         updateEvent(newCard, "view");
         viewSentRef.current = true;
       }
-    }, 4000);
+    }, TIME_TO_VIEW);
 
     // ---- Load more if near end ----
     const unseen = recommendations.length - newIndex - 1;
@@ -128,7 +136,7 @@ export default function ExercisesPage() {
                 updateEvent(firstCard, "view");
                 viewSentRef.current = true;
               }
-            }, 4000);
+            }, TIME_TO_VIEW);
           }
         }}
         onSlideChange={handleSlideChange}

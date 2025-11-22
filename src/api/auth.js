@@ -1,7 +1,7 @@
 // src/api/auth.js
 import { apiCall } from './client';
 
-export async function loginUser(username, password = "1234") {
+export async function loginUser({ username, password }) {
   const formBody = new URLSearchParams({
     grant_type: "password",
     username,

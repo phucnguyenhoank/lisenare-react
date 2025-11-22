@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { getRecommendedItems } from "./api/recommendation";
 import { ExerciseQuestions, QuestionBox, OptionRadio } from "./components/ExerciseQuestions";
 
 export default function TestBox() {

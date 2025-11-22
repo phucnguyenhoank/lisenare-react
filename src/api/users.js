@@ -2,20 +2,11 @@
 import { apiCall } from "./client";
 import { loginUser } from "./auth";
 
-export async function registerOrLogin(username) {
-  const payload = {
-    username,
-    email: null,
-    password: "1234",
-    user_level: 0,
-    goal_type: 0,
-    age_group: 0,
-  };
-
+export async function registerOrLogin(payload) {
   let justRegistered = false;
 
   try {
-    await apiCall("/users/", "POST", payload);
+    const res = await apiCall("/users/", "POST", payload);
     justRegistered = true;
     console.log("✅ Registered successfully, now logging in...");
   } catch (err) {
@@ -28,6 +19,7 @@ export async function registerOrLogin(username) {
   }
 
   // In both cases, login
+  const username = payload.username;
   const tokenRes = await loginUser(username);
 
   // Save token and username
@@ -40,4 +32,10 @@ export async function registerOrLogin(username) {
   }
 
   return { user: { username }, token: tokenRes, justRegistered };
+}
+
+export async function registerUserAPI(userData) {
+  return apiCall("/users/", "POST", userData, {
+    accept: "application/json",
+  });
 }

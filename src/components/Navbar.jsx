@@ -1,15 +1,11 @@
 // src/components/Navbar.jsx
 import { Link } from "react-router-dom";
-import AvatarMenu from "./AvatarMenu";
-import { useEffect, useState } from "react";
+import HamburgerMenu from "./HamburgerMenu";
+import { useContext, useEffect, useState } from "react";
+import { UserContext } from "../contexts/UserContext";
 
 export default function Navbar() {
-  const [username, setUsername] = useState(null);
-
-  useEffect(() => {
-    const savedUsername = localStorage.getItem("username");
-    setUsername(savedUsername);
-  }, []);
+  const { username } = useContext(UserContext);
 
   return (
     <nav className="w-full bg-white shadow-md">
@@ -27,13 +23,13 @@ export default function Navbar() {
               Hello, {username}
             </span>
           ) : (
-            <Link to="/register" className="text-blue-600 font-medium">
+            <Link to="/login" className="text-blue-600 font-medium">
               Login / Register
             </Link>
           )}
-
-          <AvatarMenu />
+          <HamburgerMenu />
         </div>
+
       </div>
     </nav>
   );
