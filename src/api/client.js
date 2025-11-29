@@ -2,18 +2,18 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 async function handleResponse(res) {
+  const text = await res.text();
+
   if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(`HTTP ${res.status}: ${errorText}`);
+    throw new Error(`HTTP ${res.status}: ${text}`);
   }
 
-  const text = await res.text();
   if (!text) return null;
 
   try {
     return JSON.parse(text);
   } catch (e) {
-    return text; // fallback to raw text if not JSON
+    return text;
   }
 }
 
@@ -27,8 +27,6 @@ export async function apiCall(endpoint, method = 'GET', data = null, headers = {
 
   // Allow sending JSON, form-encoded, or raw bodies
   if (data) options.body = data instanceof URLSearchParams ? data : JSON.stringify(data);
-
   const res = await fetch(`${BASE_URL}${endpoint}`, options);
-  console.log(data)
   return handleResponse(res);
 }

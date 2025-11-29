@@ -1,55 +1,72 @@
-const GOALS = [
-  { id: 0, label: "General English" },
-  { id: 1, label: "IELTS/TOEFL" },
-  { id: 2, label: "Professional Skills" },
-];
-
-const AGES = [
-  { id: 0, label: "Under 18" },
-  { id: 1, label: "18–30" },
-  { id: 2, label: "30–50" },
-  { id: 3, label: "50+" },
-];
+import { GOALS, AGES } from "../constants/userConfig";
 
 export default function GoalAgeStep({ data, updateField, next, back }) {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-2">Your Goals & Age</h2>
-      <p className="text-gray-500 text-sm mb-4">You can skip and change this later.</p>
+      <p className="text-gray-500 text-sm mb-4">You can change this later.</p>
 
-      <h3 className="font-semibold">Goal</h3>
-      <div className="flex gap-2 mb-4 flex-wrap">
-        {GOALS.map((g) => (
-          <button
-            key={g.id}
-            className={`p-2 rounded border ${
-              data.goal_type === g.id ? "bg-blue-600 text-white" : ""
-            }`}
-            onClick={() => updateField({ goal_type: g.id })}
-          >
-            {g.label}
-          </button>
-        ))}
+      {/* Goal Section */}
+      <h3 className="font-semibold mb-2">Goal</h3>
+      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 mb-6">
+        {GOALS.map((g) => {
+          const selected = data.goal_type === g.id;
+          return (
+            <button
+              key={g.id}
+              onClick={() => updateField({ goal_type: g.id })}
+              className={`
+                p-3 rounded-lg border w-full sm:w-auto text-left transition
+                ${selected
+                  ? "bg-black text-white border-black shadow"
+                  : "cursor-pointer hover:bg-gray-100"
+                }
+              `}
+            >
+              {g.label}
+            </button>
+          );
+        })}
       </div>
 
-      <h3 className="font-semibold">Age Group</h3>
-      <div className="flex gap-2 mb-4 flex-wrap">
-        {AGES.map((a) => (
-          <button
-            key={a.id}
-            className={`p-2 rounded border ${
-              data.age_group === a.id ? "bg-blue-600 text-white" : ""
-            }`}
-            onClick={() => updateField({ age_group: a.id })}
-          >
-            {a.label}
-          </button>
-        ))}
+      {/* Age Section */}
+      <h3 className="font-semibold mb-2">Age Group</h3>
+      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 mb-6">
+        {AGES.map((a) => {
+          const selected = data.age_group === a.id;
+          return (
+            <button
+              key={a.id}
+              onClick={() => updateField({ age_group: a.id })}
+              className={`
+                p-3 rounded-lg border w-full sm:w-auto text-left transition
+                ${selected
+                  ? "bg-black text-white border-black shadow"
+                  : "cursor-pointer hover:bg-gray-100"
+                }
+              `}
+            >
+              {a.label}
+            </button>
+          );
+        })}
       </div>
 
-      <div className="flex gap-2">
-        <button onClick={back} className="border p-2 rounded w-1/2">Back</button>
-        <button onClick={next} className="bg-blue-600 text-white p-2 rounded w-1/2">Next</button>
+      {/* Navigation */}
+      <div className="flex justify-between mt-6">
+        <button
+          onClick={back}
+          className="border p-2 px-4 cursor-pointer rounded-lg hover:bg-gray-100"
+        >
+          Back
+        </button>
+
+        <button
+          onClick={next}
+          className="bg-black text-white p-2 px-6 cursor-pointer rounded-lg"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

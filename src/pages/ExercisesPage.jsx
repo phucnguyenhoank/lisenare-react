@@ -6,13 +6,18 @@ import "swiper/css";
 import { updateEvent } from "../api/interaction";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
-
+import PortfolioPage from "./PortfolioPage";
 
 const TIME_TO_VIEW = Number(import.meta.env.VITE_TIME_TO_VIEW) || 3000;
 
 
 export default function ExercisesPage() {
   const { username } = useContext(UserContext);
+  if (!username) {
+    // User not logged in → show portfolio
+    return <PortfolioPage />;
+  }
+
   const navigate = useNavigate();
 
   const [recommendations, setRecommendations] = useState([]);
@@ -39,10 +44,11 @@ export default function ExercisesPage() {
     try {
       if (!username) {
         navigate("/login");
+        return; // IMPORTANT
       }
+
       const batch = await getRecommendedItems(username);
       setRecommendations((prev) => [...prev, ...batch]);
-
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -53,8 +59,10 @@ export default function ExercisesPage() {
   }
 
   useEffect(() => {
-    loadBatch();
-  }, []);
+    if (username) {
+      loadBatch();
+    }
+  }, [username]);
 
   // Keyboard nav
   useEffect(() => {

@@ -14,6 +14,7 @@ export function UserProvider({ children }) {
   useEffect(() => {
     const user = getLoggedInUsername();
     setUsername(user);
+    console.log("CONTEXT USERNAME" + user);
   }, []);
 
   return (

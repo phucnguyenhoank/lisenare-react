@@ -23,7 +23,6 @@ export default function LoginPage() {
       const res = await loginUser({ username: usernameInput, password });
       localStorage.setItem("access_token", res.access_token);
 
-      // Decode username from token and update context
       const payload = parseJwt(res.access_token);
       setUsername(payload.sub);
 
@@ -36,46 +35,62 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="max-w-sm mx-auto p-4 flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold text-center">Login</h1>
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-sm bg-white p-6 rounded-xl shadow-sm border">
+        <h1 className="text-2xl font-semibold text-center mb-6">Welcome Back</h1>
 
-      <input
-        className="border p-2 rounded"
-        placeholder="Username"
-        value={usernameInput}
-        onChange={(e) => setUsernameInput(e.target.value)}
-      />
+        <div className="flex flex-col gap-4">
 
-      <input
-        type="password"
-        className="border p-2 rounded"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+          <div>
+            <label className="text-sm font-medium block mb-1">Username</label>
+            <input
+              className="border rounded-lg p-2 w-full focus:outline-none focus:ring-1 focus:ring-black"
+              placeholder="Enter your username"
+              value={usernameInput}
+              onChange={(e) => setUsernameInput(e.target.value)}
+            />
+          </div>
 
-      <button
-        className="bg-blue-600 text-white p-2 rounded"
-        onClick={handleLogin}
-      >
-        Login
-      </button>
+          <div>
+            <label className="text-sm font-medium block mb-1">Password</label>
+            <input
+              type="password"
+              className="border rounded-lg p-2 w-full focus:outline-none focus:ring-1 focus:ring-black"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
 
-      <button
-        className="text-blue-600 underline p-2 rounded"
-        onClick={() => navigate("/register")}
-      >
-        Register
-      </button>
+          <button
+            className="bg-black text-white p-2 rounded-lg font-medium hover:opacity-90 transition cursor-pointer"
+            onClick={handleLogin}
+          >
+            Login
+          </button>
 
-      <button
-        className="text-blue-600 underline p-2 rounded"
-        onClick={() => navigate("/forgot")}
-      >
-        Forgot your password?
-      </button>
+          <div className="flex justify-between text-sm mt-2">
+            <button
+              className="underline text-gray-600 hover:text-black transition cursor-pointer"
+              onClick={() => navigate("/forgot")}
+            >
+              Forgot password?
+            </button>
 
-      {message && <p className="text-center">{message}</p>}
+            <button
+              className="underline text-gray-600 hover:text-black transition cursor-pointer"
+              onClick={() => navigate("/register")}
+            >
+              Create account
+            </button>
+          </div>
+
+          {message && (
+            <p className="text-center text-sm mt-3">{message}</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
+

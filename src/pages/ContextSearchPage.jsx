@@ -15,51 +15,60 @@ export default function ContextSearchPage() {
     setLoading(true);
     setError('');
     try {
-      const data = await apiCall(`/context-search/search?q=${encodeURIComponent(query)}`);
+      const data = await apiCall(`/context-search/search`, 'POST', { query });
       setResults(data || []);
     } catch (err) {
-      setError('Failed to search. Check console or server.');
       console.error(err);
+      setError('Failed to fetch results.');
     } finally {
       setLoading(false);
     }
   };
 
+  const noResults = !loading && results.length === 0 && query.trim();
+
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4">
+    <div className="min-h-screen bg-white py-10 px-4 text-black">
       <div className="max-w-xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-bold text-center text-gray-800 mb-6">
+        <h1 className="text-3xl font-semibold text-center mb-8">
           Context Search
         </h1>
 
-        <form onSubmit={search} className="flex flex-col sm:flex-row gap-3 mb-6">
+        {/* Search Bar */}
+        <form onSubmit={search} className="flex gap-2 mb-6">
           <input
-            type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search for quotes... (e.g. jump off)"
-            className="w-full px-4 py-3 text-base sm:text-lg border border-gray-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500 focus:border-transparent shadow-sm"
+            placeholder="Search for quotes..."
+            className="flex-1 px-3 py-2 border border-black rounded-xl bg-white text-black focus:outline-none"
           />
           <button
             type="submit"
             disabled={loading}
-            className="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold rounded-xl shadow-md transition duration-200"
+            className="px-4 py-2 border border-black rounded-xl cursor-pointer bg-black text-white disabled:opacity-50"
           >
-            {loading ? 'Searching...' : 'Search'}
+            {loading ? '...' : 'Search'}
           </button>
         </form>
 
+        {/* Error */}
         {error && (
-          <div className="text-red-600 text-center font-medium mb-4">{error}</div>
-        )}
-
-        {!loading && results.length === 0 && query.trim() && (
-          <div className="text-gray-700 text-center font-medium mt-4">
-            Sorry, no quotes found for your query.
+          <div className="text-red-600 text-center mb-4 text-sm">
+            {error}
           </div>
         )}
 
-        {results.length > 0 && <VideoQuotePlayer quotes={results} query={query} />}
+        {/* No results */}
+        {noResults && (
+          <p className="text-center text-sm text-gray-800">
+            No quotes found.
+          </p>
+        )}
+
+        {/* Results */}
+        {results.length > 0 && (
+          <VideoQuotePlayer quotes={results} query={query} />
+        )}
       </div>
     </div>
   );

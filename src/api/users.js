@@ -3,35 +3,33 @@ import { apiCall } from "./client";
 import { loginUser } from "./auth";
 
 export async function registerOrLogin(payload) {
+  console.log("PAYLOAD" + payload);
+
   let justRegistered = false;
+  let tokenRes;
 
   try {
+    // Try to register
     const res = await apiCall("/users/", "POST", payload);
+    tokenRes = res["token"];
     justRegistered = true;
-    console.log("✅ Registered successfully, now logging in...");
+    console.log("✅ Registered successfully!");
   } catch (err) {
-    // only ignore "already exists" errors
     if (err.message.includes("already") || err.message.includes("409")) {
       console.log("User already exists, logging in...");
+      const { username, password } = payload;
+      tokenRes = await loginUser({ username, password });
     } else {
-      throw err; // rethrow other real errors
+      throw err;
     }
   }
 
-  // In both cases, login
-  const username = payload.username;
-  const tokenRes = await loginUser(username);
-
-  // Save token and username
   if (tokenRes?.access_token) {
     localStorage.setItem("access_token", tokenRes.access_token);
-    localStorage.setItem("username", username);
-
-    // Redirect to home
     window.location.href = "/";
   }
 
-  return { user: { username }, token: tokenRes, justRegistered };
+  return { token: tokenRes, justRegistered };
 }
 
 export async function registerUserAPI(userData) {

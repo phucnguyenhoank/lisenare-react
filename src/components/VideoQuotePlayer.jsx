@@ -18,43 +18,34 @@ export default function VideoQuotePlayer({ quotes, query }) {
   const embedUrl = `https://www.youtube.com/embed/${videoId}?start=${startTime}&autoplay=1&rel=0&modestbranding=1`;
 
   const goTo = (index) => {
-    if (index >= 0 && index < quotes.length) {
-      setCurrentIndex(index);
-    }
+    if (index >= 0 && index < quotes.length) setCurrentIndex(index);
   };
 
   const replay = () => {
-    if (iframeRef.current) {
-      iframeRef.current.src = embedUrl; // Forces restart from timestamp
-    }
+    if (iframeRef.current) iframeRef.current.src = embedUrl;
   };
 
-  // Highlight query words in the text
   const getHighlightedText = (text, query) => {
     if (!query) return text;
     const words = query.trim().split(/\s+/).filter(Boolean);
-    if (words.length === 0) return text;
-    const regex = new RegExp(`(${words.map(w => escapeRegExp(w)).join('|')})`, 'gi');
+    if (!words.length) return text;
+    const regex = new RegExp(`(${words.map(escapeRegExp).join('|')})`, 'gi');
     return text.split(regex).map((part, i) =>
-      regex.test(part) ? (
-        <span key={i} className="bg-yellow-200 rounded px-1">{part}</span>
-      ) : part
+      regex.test(part) ? <span key={i} className="bg-yellow-200 rounded px-1">{part}</span> : part
     );
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-200">
+    <div className="bg-white border border-black rounded p-4">
       <div className="text-center mb-4">
-        <h3 className="text-xl font-bold text-gray-800">
+        <h3 className="text-lg font-semibold mb-2">
           Quote {currentIndex + 1} of {quotes.length}
         </h3>
-        <p className="text-base text-gray-600 mt-2 italic leading-relaxed max-w-3xl mx-auto">
-          "{getHighlightedText(current.text, query)}"
-        </p>
-        <p className="text-sm text-gray-500 mt-1">Timestamp: {formatTime(startTime)}</p>
+        <p className="italic text-sm mb-1">"{getHighlightedText(current.text, query)}"</p>
+        <p className="text-xs text-gray-800">Timestamp: {formatTime(startTime)}</p>
       </div>
 
-      <div className="relative w-full aspect-video bg-black rounded-xl overflow-hidden shadow-2xl mb-6">
+      <div className="relative w-full aspect-video bg-black mb-4 rounded-sm overflow-hidden">
         <iframe
           ref={iframeRef}
           src={embedUrl}
@@ -65,28 +56,28 @@ export default function VideoQuotePlayer({ quotes, query }) {
         ></iframe>
       </div>
 
-      <div className="flex justify-center items-center gap-6 flex-wrap text-white">
+      <div className="flex justify-center items-center gap-4 flex-wrap text-black">
         <button
           onClick={() => goTo(currentIndex - 1)}
           disabled={currentIndex === 0}
-          className="p-3 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-full transition"
+          className="p-2 border border-black rounded-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <FaArrowLeft size={20} />
+          <FaArrowLeft size={16} />
         </button>
 
         <button
           onClick={replay}
-          className="p-3 bg-indigo-600 hover:bg-indigo-700 rounded-full shadow-md transition transform hover:scale-110"
+          className="p-2 border border-black rounded-sm cursor-pointer"
         >
-          <FaRedo size={20} />
+          <FaRedo size={16} />
         </button>
 
         <button
           onClick={() => goTo(currentIndex + 1)}
           disabled={currentIndex === quotes.length - 1}
-          className="p-3 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-full transition"
+          className="p-2 border border-black rounded-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <FaArrowRight size={20} />
+          <FaArrowRight size={16} />
         </button>
       </div>
     </div>
@@ -103,7 +94,6 @@ function formatTime(seconds) {
   return `${s}s`;
 }
 
-// Escape regex special characters in query words
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

@@ -8,7 +8,7 @@ import ContextSearchPage from "./pages/ContextSearchPage";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import { UserProvider } from "./contexts/UserContext";
-import ForgotPasswordPage from "./components/ForgotPasswordPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
 function App() {
   return (
@@ -37,7 +37,6 @@ export default App;
 // // ------- TESTING ----------
 
 // import TestBox from "./TestBox";
-
 
 // function App() {
 //   return (

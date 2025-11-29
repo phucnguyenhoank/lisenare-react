@@ -53,7 +53,7 @@ export default function ExerciseCard({ studySessionId, exercise }) {
       <h3 className="text-2xl font-bold mb-3">{exercise.title}</h3>
 
       <div className="flex flex-wrap gap-2 mb-6 text-sm">
-        <span className="bg-blue-100 px-2 py-1 rounded-full">
+        <span className="bg--100 px-2 py-1 rounded-full">
           Difficulty: {levelLabels[exercise.difficulty] || "Unknown"}
         </span>
         <span className="bg-green-100 px-2 py-1 rounded-full">
@@ -61,6 +61,9 @@ export default function ExerciseCard({ studySessionId, exercise }) {
         </span>
         <span className="bg-yellow-100 px-2 py-1 rounded-full">
           Questions: {exercise.num_questions}
+        </span>
+        <span className="bg-orange-100 px-2 py-1 rounded-full">
+          Topic: {exercise.topic_name}
         </span>
       </div>
 

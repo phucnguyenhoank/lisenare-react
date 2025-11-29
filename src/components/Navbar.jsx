@@ -9,7 +9,7 @@ export default function Navbar() {
   console.log("NavBar" + username);
 
   return (
-    <nav className="w-full bg-white shadow-md">
+    <nav className="w-full bg-white">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
 
         {/* brand logo */}
@@ -24,8 +24,8 @@ export default function Navbar() {
               Hello, {username}
             </span>
           ) : (
-            <Link to="/login" className="text-blue-600 font-medium">
-              {/* Login / Register */}
+            <Link to="/login" className="text-black font-medium">
+              Login / Register
             </Link>
           )}
           <HamburgerMenu />

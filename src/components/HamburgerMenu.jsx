@@ -10,7 +10,7 @@ export default function HamburgerMenu() {
   const { setUsername } = useContext(UserContext);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("access_token");
     localStorage.removeItem("username");
     setUsername(null);
     navigate("/login");
