@@ -32,7 +32,11 @@ export default function SlideMenu({ menuOpen, onClose, onLogout }) {
             Context Search
           </Link>
         </li>
-
+        <li>
+          <Link to="/generate-questions" className="hover:text-blue-600" onClick={onClose}>
+            Generate Question
+          </Link>
+        </li>
         <li>
           <button
             onClick={() => {
