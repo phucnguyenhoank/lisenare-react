@@ -12,8 +12,7 @@ export default function PortfolioPage() {
 
       {/* Description */}
       <p className="text-lg mb-8 text-center max-w-xl">
-        Lisenare is an English learning app created by Nguyen Hoang Phuc & Pham Trung Ky, 
-        students from the University of Technology and Education.
+        Lisenare is an English learning app.
       </p>
 
       {/* Login/Register buttons */}
