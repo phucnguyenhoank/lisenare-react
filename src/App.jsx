@@ -10,6 +10,7 @@ import ProfilePage from "./pages/ProfilePage";
 import { UserProvider } from "./contexts/UserContext";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import GenerateQuestionsPage from "./pages/GenerateQuestionsPage";
+import HistoryQuestionsPage from "./pages/HistoryQuestionsPage";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/forgot" element={<ForgotPasswordPage />} />
           <Route path="/generate-questions" element={<GenerateQuestionsPage/>}/>
+          <Route path="/history" element={<HistoryQuestionsPage/>}/>
         </Routes>
       </Router>
     </UserProvider>

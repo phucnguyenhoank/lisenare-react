@@ -29,7 +29,7 @@ export function OptionRadio({ qId, optIdx, label, text, selected, onSelect, disa
  *  - answer (full text of correct answer) [optional]
  *  - explanation [optional]
  */
-export function QuestionBox({ question, answers, onSelect, questionIndex, reveal }) {
+export function QuestionBox({ question, answers, onSelect, questionIndex, reveal, feedback, onFeedback, }) {
   const options = ["A", "B", "C", "D"];
   const qId = question.id;
 
@@ -83,6 +83,31 @@ export function QuestionBox({ question, answers, onSelect, questionIndex, reveal
           <div>{question.explanation}</div>
         </div>
       )}
+
+      {/*like / dislike */}
+      <div className="mt-4 flex space-x-3">
+        <button
+          onClick={() => onFeedback(qId, "like")}
+          className={`px-3 py-1 rounded border ${
+            feedback[qId] === "like"
+              ? "bg-emerald-100 border-emerald-500"
+              : "bg-white hover:bg-gray-100"
+          }`}
+        >
+          👍 Like
+        </button>
+
+        <button
+          onClick={() => onFeedback(qId, "dislike")}
+          className={`px-3 py-1 rounded border ${
+            feedback[qId] === "dislike"
+              ? "bg-red-100 border-red-500"
+              : "bg-white hover:bg-gray-100"
+          }`}
+        >
+          👎 Dislike
+        </button>
+      </div>
     </div>
   );
 }
@@ -91,7 +116,7 @@ export function QuestionBox({ question, answers, onSelect, questionIndex, reveal
  * ExerciseQuestions: list of questions
  * props.exercise = { questions: [...] } but we accept an array as well
  */
-export default function ExerciseQuestions({ questions, answers, onSelect, reveal = false }) {
+export default function ExerciseQuestions({ questions, answers, onSelect, reveal = false, feedback, onFeedback, }) {
   return (
     <div className="space-y-6">
       {questions.map((q, index) => (
@@ -102,6 +127,8 @@ export default function ExerciseQuestions({ questions, answers, onSelect, reveal
           onSelect={onSelect}
           questionIndex={index}
           reveal={reveal}
+          feedback={feedback}
+          onFeedback={onFeedback}
         />
       ))}
     </div>
