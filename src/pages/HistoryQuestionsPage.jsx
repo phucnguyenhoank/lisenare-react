@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { getHistoryQuestions } from "../api/question_history";
-import ReadingItem from "../components/HistoryReadingItem";
+import HistoryReadingItem from "../components/HistoryReadingItem";
 import { getLoggedInUsername } from "../utils/jwt";
+
 export default function HistoryPage() {
   const [data, setData] = useState({});
   const [loading, setLoading] = useState(true);
-  const [userName, setUserName] = useState(() => getLoggedInUsername());
+  const [userName] = useState(() => getLoggedInUsername());
 
   useEffect(() => {
     async function fetchData() {
@@ -22,18 +23,20 @@ export default function HistoryPage() {
     fetchData();
   }, [userName]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p className="text-center mt-10">Loading...</p>;
 
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "20px" }}>
-      <h1>Lịch sử câu hỏi đã tạo</h1>
+    <div className="max-w-4xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-6">Lịch sử câu hỏi đã tạo</h1>
 
-      {Object.keys(data).length === 0 && <p>Không có dữ liệu</p>}
+      {Object.keys(data).length === 0 && (
+        <p className="text-gray-600">Không có dữ liệu</p>
+      )}
 
       {/* Loop Lession → Reading */}
       {Object.entries(data).map(([lessionId, readings]) =>
         Object.entries(readings).map(([readingId, readingData]) => (
-          <ReadingItem
+          <HistoryReadingItem
             key={`${lessionId}-${readingId}`}
             lessionId={lessionId}
             readingId={readingId}
