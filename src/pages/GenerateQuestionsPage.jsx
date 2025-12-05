@@ -12,7 +12,7 @@ function generateUUID() {
   });
 }
 
-function flattenAndNormalize(items) {
+export function flattenAndNormalize(items) {
   const out = [];
 
   function recurse(x) {
@@ -65,11 +65,20 @@ export default function QuestionGenerator() {
   const [reveal, setReveal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [feedback, setFeedback] = useState({});
 
   const onSelect = (qId, optIdx) => {
     setAnswers((prev) => ({ ...prev, [qId]: optIdx }));
   };
+  const handleFeedback = (qId, type) => {
+    setFeedback((prev) => ({
+      ...prev,
+      [qId]: type,
+    }));
 
+    // Nếu bạn muốn gửi về BE:
+    // sendQuestionFeedback({ sessionId, userName, questionId: qId, feedback: type });
+  };
   const handleGenerate = async () => {
     setError(null);
     setLoading(true);
@@ -172,7 +181,7 @@ export default function QuestionGenerator() {
             </div>
           </div>
 
-          <GeneratedQuestions questions={questions} answers={answers} onSelect={onSelect} reveal={reveal} />
+          <GeneratedQuestions questions={questions} answers={answers} onSelect={onSelect} reveal={reveal} feedback={feedback} onFeedback={handleFeedback} />
         </div>
       )}
 
