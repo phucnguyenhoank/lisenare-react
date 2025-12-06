@@ -19,8 +19,8 @@ export default function SlideMenu({ menuOpen, onClose, onLogout }) {
 
       <ul className="mt-4 flex flex-col gap-4 p-4">
         <li>
-          <Link to="/saved-lessons" className="hover:text-black" onClick={onClose}>
-            Saved Lessons
+          <Link to="/submitted-lessons" className="hover:text-black" onClick={onClose}>
+            Submitted Lessons
           </Link>
         </li>
 

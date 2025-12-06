@@ -11,6 +11,9 @@ import { UserProvider } from "./contexts/UserContext";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import GenerateQuestionsPage from "./pages/GenerateQuestionsPage";
 import HistoryQuestionsPage from "./pages/HistoryQuestionsPage";
+import SubmittedSessionsPage from "./pages/SubmittedSessionsPage";
+import SessionDetailPage from "./pages/SessionDetailPage";
+
 
 function App() {
   return (
@@ -21,13 +24,15 @@ function App() {
           <Route path="/" element={<ExercisesPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/saved-lessons" element={<h1 className="p-4">You Lessons Will Appear Here</h1>} />
+          <Route path="/submitted-lessons" element={<SubmittedSessionsPage />} />
+          <Route path="/study-session/:sessionId" element={<SessionDetailPage />} />
           <Route path="/writing-check" element={<WritingCheckPage />} />
           <Route path="/context-search" element={<ContextSearchPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/forgot" element={<ForgotPasswordPage />} />
           <Route path="/generate-questions" element={<GenerateQuestionsPage/>}/>
           <Route path="/history" element={<HistoryQuestionsPage/>}/>
+          
         </Routes>
       </Router>
     </UserProvider>

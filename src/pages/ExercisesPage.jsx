@@ -46,8 +46,13 @@ export default function ExercisesPage() {
         navigate("/login");
         return; // IMPORTANT
       }
-
+      const start = performance.now();
       const batch = await getRecommendedItems(username);
+      const end = performance.now();
+      console.log(
+        "Client-perceived latency (ms): ",
+        end - start
+      );
       setRecommendations((prev) => [...prev, ...batch]);
     } catch (err) {
       console.error(err);

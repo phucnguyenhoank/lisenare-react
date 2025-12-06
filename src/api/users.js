@@ -37,3 +37,7 @@ export async function registerUserAPI(userData) {
     accept: "application/json",
   });
 }
+
+export async function getUser(params) {
+  
+}
