@@ -1,17 +1,28 @@
 // src/components/ExerciseQuestions.jsx
 import React from "react";
+import { sendEvent } from "../api/feedbackuser";
 
 /**
  * OptionRadio: one radio option
  */
-export function OptionRadio({ qId, optIdx, label, text, selected, onSelect, disabled }) {
-  return (
-    <label className={`flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}>
+export function OptionRadio({ qId, optIdx, label, text, selected, onSelect, disabled, passage, question_text, username}) {
+   return (
+    <label
+      className={`flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-2 rounded ${
+        disabled ? "opacity-60 cursor-not-allowed" : ""
+      }`}
+      onMouseEnter={() =>
+        sendEvent(username, "option_hover", passage, question_text, { option: label })
+      }
+    >
       <input
         type="radio"
         name={`q-${qId}`}
         checked={selected === optIdx}
-        onChange={() => !disabled && onSelect(qId, optIdx)}
+        onChange={() => {
+          sendEvent(username, "option_selected", passage,question_text, { option: label });
+          !disabled && onSelect(qId, optIdx);
+        }}
         className="text-emerald-600 focus:ring-emerald-500"
       />
       <span className="font-medium text-gray-700">{label}.</span>
@@ -29,9 +40,25 @@ export function OptionRadio({ qId, optIdx, label, text, selected, onSelect, disa
  *  - answer (full text of correct answer) [optional]
  *  - explanation [optional]
  */
-export function QuestionBox({ question, answers, onSelect, questionIndex, reveal, feedback, onFeedback, }) {
+export function QuestionBox({ question, answers, onSelect, questionIndex, reveal, feedback, onFeedback, passage, username}) {
   const options = ["A", "B", "C", "D"];
   const qId = question.id;
+  // --- EVENT 2: tính thời gian user xem câu hỏi ---
+  const viewStartRef = React.useRef(Date.now());
+
+  // track "question_view" khi câu hỏi mount
+  React.useEffect(() => {
+    sendEvent(username, "question_view", passage, question.question_text, {});
+    viewStartRef.current = Date.now();
+  }, [qId]);
+
+  // khi unmount -> gửi time_spent_on_question
+  React.useEffect(() => {
+    return () => {
+      const duration = Date.now() - viewStartRef.current;
+      sendEvent(username, "time_spent_on_question", passage,question.question_text, { duration_ms: duration });
+    };
+  }, []);
 
   // map option index -> text
   const optionText = (i) => question[`option_${options[i].toLowerCase()}`] || "";
@@ -71,6 +98,9 @@ export function QuestionBox({ question, answers, onSelect, questionIndex, reveal
                 selected={selected}
                 onSelect={onSelect}
                 disabled={reveal} // after reveal don't allow changes
+                passage={passage}
+                question_text={question.question_text}
+                username={username}
               />
             </div>
           );
@@ -87,7 +117,10 @@ export function QuestionBox({ question, answers, onSelect, questionIndex, reveal
       {/*like / dislike */}
       <div className="mt-4 flex space-x-3">
         <button
-          onClick={() => onFeedback(qId, "like")}
+          onClick={() => {
+            sendEvent(username, "like", passage, question.question_text, {});
+            onFeedback(qId, "like");
+          }}
           className={`px-3 py-1 rounded border ${
             feedback[qId] === "like"
               ? "bg-emerald-100 border-emerald-500"
@@ -98,7 +131,10 @@ export function QuestionBox({ question, answers, onSelect, questionIndex, reveal
         </button>
 
         <button
-          onClick={() => onFeedback(qId, "dislike")}
+          onClick={() => {
+            sendEvent(username, "dislike", passage, question.question_text, {});
+            onFeedback(qId, "dislike");
+          }}
           className={`px-3 py-1 rounded border ${
             feedback[qId] === "dislike"
               ? "bg-red-100 border-red-500"
@@ -116,7 +152,7 @@ export function QuestionBox({ question, answers, onSelect, questionIndex, reveal
  * ExerciseQuestions: list of questions
  * props.exercise = { questions: [...] } but we accept an array as well
  */
-export default function ExerciseQuestions({ questions, answers, onSelect, reveal = false, feedback, onFeedback, }) {
+export default function ExerciseQuestions({ questions, answers, onSelect, reveal = false, feedback, onFeedback, passage, username}) {
   return (
     <div className="space-y-6">
       {questions.map((q, index) => (
@@ -129,6 +165,8 @@ export default function ExerciseQuestions({ questions, answers, onSelect, reveal
           reveal={reveal}
           feedback={feedback}
           onFeedback={onFeedback}
+          passage={passage}
+          username={username}
         />
       ))}
     </div>
