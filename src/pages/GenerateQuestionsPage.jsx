@@ -181,7 +181,7 @@ export default function QuestionGenerator() {
             </div>
           </div>
 
-          <GeneratedQuestions questions={questions} answers={answers} onSelect={onSelect} reveal={reveal} feedback={feedback} onFeedback={handleFeedback} />
+          <GeneratedQuestions questions={questions} answers={answers} onSelect={onSelect} reveal={reveal} feedback={feedback} onFeedback={handleFeedback} passage={passage} username={userName}/>
         </div>
       )}
 
