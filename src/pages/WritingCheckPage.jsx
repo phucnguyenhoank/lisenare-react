@@ -19,7 +19,15 @@ export default function WritingCheckPage() {
     setLoading(true); // start loading
     try {
       const prompt = stylePrompts[style];
+      const start = performance.now();
       const resp = await checkWriting(prompt, text);
+      const end = performance.now();
+      console.log(
+        "Client-perceived latency (ms) Writing Check: ",
+        end - start
+      );
+      
+
       const textResponse = resp?.edited_text ?? "";
       setCorrected(textResponse);
       setIsEditing(false);

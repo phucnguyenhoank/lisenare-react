@@ -15,7 +15,13 @@ export default function ContextSearchPage() {
     setLoading(true);
     setError('');
     try {
+      const start = performance.now();
       const data = await apiCall(`/context-search/search`, 'POST', { query });
+      const end = performance.now();
+      console.log(
+        "Client-perceived latency (ms) Context Search:",
+        end - start
+      );
       setResults(data || []);
     } catch (err) {
       console.error(err);
