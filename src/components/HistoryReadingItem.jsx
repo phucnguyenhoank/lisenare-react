@@ -11,17 +11,17 @@ export default function HistoryReadingItem({ lessionId, readingId, data }) {
         onClick={() => setOpen(!open)}
       >
         <h3 className="text-lg font-semibold text-gray-800">
-          📘 Title {data.title} — Reading {readingId}
+          Title {data.title}
         </h3>
         <span className="text-xl">{open ? "▲" : "▼"}</span>
       </div>
 
       {/* Content */}
       {open && (
-        <div className="mt-4 space-y-4">
+        <div className="block text-sm font-medium">
           {/* Passage */}
           <div>
-            <div className="font-semibold text-gray-700 mb-1">📖 Passage:</div>
+            <div className="font-semibold text-gray-700 mb-1">Passage:</div>
             <div className="bg-gray-50 p-3 rounded text-gray-800 whitespace-pre-wrap">
               {data.passage}
             </div>
@@ -30,7 +30,7 @@ export default function HistoryReadingItem({ lessionId, readingId, data }) {
           {/* Questions */}
           <div>
             <h4 className="text-md font-semibold text-gray-800 mb-2">
-              ❓ Danh sách câu hỏi:
+              Danh sách câu hỏi:
             </h4>
 
             <div className="space-y-4">
@@ -41,7 +41,7 @@ export default function HistoryReadingItem({ lessionId, readingId, data }) {
                 >
                   {/* Question Text */}
                   <p className="font-medium text-gray-900 mb-2">
-                    <strong>Câu hỏi:</strong> {q.text}
+                    <strong>Question:</strong> {q.text}
                   </p>
 
                   {/* Options */}
@@ -54,13 +54,13 @@ export default function HistoryReadingItem({ lessionId, readingId, data }) {
 
                   {/* Correct Answer */}
                   <p className="mt-2 text-emerald-700 font-medium">
-                    ✅ Đáp án đúng:{" "}
+                    Correct Answer:{" "}
                     {["A", "B", "C", "D"][q.correct - 1]}
                   </p>
 
                   {/* Explanation */}
                   <div className="mt-2 bg-gray-50 p-2 rounded text-gray-700">
-                    <strong>💡 Giải thích:</strong> {q.explanation}
+                    <strong>Explanation:</strong> {q.explanation}
                   </div>
                 </div>
               ))}

@@ -45,7 +45,11 @@ export default function SlideMenu({ menuOpen, onClose, onLogout }) {
             History Generate Question
           </Link>
         </li>
-
+        <li>
+          <Link to="/user-reading" className="hover:text-blue-600" onClick={onClose}>
+            Tìm Kiếm Người Dùng
+          </Link>
+        </li>
         {username && (
           <li>
             <Link to="/profile" className="hover:text-black" onClick={onClose}>

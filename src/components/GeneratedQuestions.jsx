@@ -127,7 +127,7 @@ export function QuestionBox({ question, answers, onSelect, questionIndex, reveal
               : "bg-white hover:bg-gray-100"
           }`}
         >
-          👍 Like
+          Like
         </button>
 
         <button
@@ -141,7 +141,7 @@ export function QuestionBox({ question, answers, onSelect, questionIndex, reveal
               : "bg-white hover:bg-gray-100"
           }`}
         >
-          👎 Dislike
+          Dislike
         </button>
       </div>
     </div>
