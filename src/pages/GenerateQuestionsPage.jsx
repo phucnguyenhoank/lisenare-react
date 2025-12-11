@@ -112,9 +112,11 @@ export default function QuestionGenerator() {
       <h1 className="text-2xl font-bold mb-4">Question generator</h1>
 
       <div className="mb-4 space-y-2">
-        <label className="block text-sm font-medium">User name</label>
+        <label className="hidden">User name</label>
         <input
           value={userName}
+          readOnly
+          hidden
           onChange={(e) => {
             setUserName(e.target.value);
             localStorage.setItem("username", e.target.value);
@@ -135,7 +137,7 @@ export default function QuestionGenerator() {
 
       <div className="flex items-center gap-3 mb-4">
         <div>
-          <label className="block text-sm font-medium">Top K</label>
+          <label className="block text-sm font-medium">Số lượng câu hỏi</label>
           <input
             type="number"
             min={1}
@@ -147,10 +149,11 @@ export default function QuestionGenerator() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium">Session id</label>
+          <label className="hidden">Session id</label>
           <input
             value={sessionId}
             readOnly
+            hidden
             onChange={(e) => setSessionId(e.target.value)}
             className="w-64 p-2 border rounded"
           />

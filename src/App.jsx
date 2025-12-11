@@ -13,7 +13,7 @@ import GenerateQuestionsPage from "./pages/GenerateQuestionsPage";
 import HistoryQuestionsPage from "./pages/HistoryQuestionsPage";
 import SubmittedSessionsPage from "./pages/SubmittedSessionsPage";
 import SessionDetailPage from "./pages/SessionDetailPage";
-
+import UserReadingPage from "./pages/UserReadingPage"
 
 function App() {
   return (
@@ -32,7 +32,7 @@ function App() {
           <Route path="/forgot" element={<ForgotPasswordPage />} />
           <Route path="/generate-questions" element={<GenerateQuestionsPage/>}/>
           <Route path="/history" element={<HistoryQuestionsPage/>}/>
-          
+          <Route path="/user-reading" element={<UserReadingPage/>}/>
         </Routes>
       </Router>
     </UserProvider>
