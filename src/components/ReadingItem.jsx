@@ -1,20 +1,90 @@
 import { useState } from "react";
 
+/** OptionRadio riêng cho ReadingItem */
+function OptionRadio({ qId, optIdx, label, text, selected, onSelect, disabled }) {
+  return (
+    <label
+      className={`flex items-center space-x-2 cursor-pointer p-2 rounded ${
+        disabled ? "opacity-60 cursor-not-allowed" : "hover:bg-gray-50"
+      }`}
+    >
+      <input
+        type="radio"
+        name={`q-${qId}`}
+        checked={selected === optIdx}
+        onChange={() => !disabled && onSelect(qId, optIdx)}
+        className="text-emerald-600 focus:ring-emerald-500"
+      />
+      <span className="font-medium text-gray-700">{label}.</span>
+      <span className="text-gray-800">{text}</span>
+    </label>
+  );
+}
+
+/** QuestionBox cho ReadingItem */
+function QuestionBox({ question, questionIndex, answers, onSelect, reveal }) {
+  const options = Object.keys(question.options);
+  const qId = question.id;
+  const selected = answers[qId];
+
+  // tìm index đúng
+  const correctIndex = options.findIndex(
+    (key) => question.options[key] === question.options[Object.keys(question.options)[question.correct]]
+  );
+
+  return (
+    <div className="mb-6 p-4 border rounded-lg bg-white">
+      <p className="font-semibold text-lg mb-3 text-gray-800">
+        {questionIndex + 1}. {question.text}
+      </p>
+
+      <div className="space-y-2">
+        {options.map((key, i) => {
+          const isSelected = selected === i;
+          const isCorrect = reveal && i === correctIndex;
+          const isWrongSelected = reveal && isSelected && i !== correctIndex;
+          const bgClass = isCorrect
+            ? "bg-emerald-50 border-emerald-300"
+            : isWrongSelected
+            ? "bg-red-50 border-red-300"
+            : "hover:bg-gray-50";
+
+          return (
+            <div key={i} className={`p-1 rounded border ${bgClass}`}>
+              <OptionRadio
+                qId={qId}
+                optIdx={i}
+                label={key}
+                text={question.options[key]}
+                selected={selected}
+                onSelect={onSelect}
+                disabled={reveal}
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      {reveal && question.explanation && (
+        <div className="mt-3 text-sm text-gray-700 bg-gray-50 p-3 rounded">
+          <div className="font-medium mb-1">Explanation</div>
+          <div>{question.explanation}</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** ReadingItem chính */
 export default function ReadingItem({ reading }) {
   const [open, setOpen] = useState(false);
-
-  // userAnswers = { 25: "A", ... }
   const [userAnswers, setUserAnswers] = useState({});
-
-  // reveal state: true → hiển thị đúng/sai & explanation
   const [isRevealed, setIsRevealed] = useState(false);
 
-  function handleSelect(questionId, optionKey) {
-    if (isRevealed) return; // khi đã reveal thì không cho đổi đáp án
-
+  function handleSelect(qId, optIdx) {
     setUserAnswers((prev) => ({
       ...prev,
-      [questionId]: optionKey,
+      [qId]: optIdx,
     }));
   }
 
@@ -28,144 +98,47 @@ export default function ReadingItem({ reading }) {
   }
 
   return (
-    <div
-      style={{
-        border: "1px solid #ddd",
-        padding: 20,
-        borderRadius: 10,
-        marginBottom: 20,
-      }}
-    >
-      <h2 style={{ cursor: "pointer" }} onClick={() => setOpen(!open)}>
+    <div className="border border-gray-300 p-5 rounded-lg mb-5">
+      <h2
+        className="cursor-pointer text-lg font-semibold mb-3"
+        onClick={() => setOpen(!open)}
+      >
         {reading.title}
       </h2>
 
       {open && (
         <>
-          <p style={{ whiteSpace: "pre-line", marginBottom: 20 }}>
-            {reading.passage}
-          </p>
+          <p className="whitespace-pre-line mb-5">{reading.passage}</p>
 
-          {/* --- 2 button --- */}
-          <div style={{ marginBottom: 20, display: "flex", gap: 10 }}>
+          {/* Buttons */}
+          <div className="mb-5 flex gap-2">
             <button
               onClick={resetAll}
-              style={{
-                padding: "8px 16px",
-                background: "#f3f4f6",
-                border: "1px solid #d1d5db",
-                cursor: "pointer",
-                borderRadius: 6,
-              }}
+              className="px-4 py-2 rounded border border-gray-300 bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer"
             >
               Reset
             </button>
-
             <button
               onClick={revealAll}
-              style={{
-                padding: "8px 16px",
-                background: "#3b82f6",
-                color: "white",
-                border: "none",
-                cursor: "pointer",
-                borderRadius: 6,
-              }}
+              className="px-4 py-2 bg-emerald-600 text-white rounded disabled:opacity-60"
             >
               Reveal
             </button>
           </div>
 
-          {/* --- Danh sách câu hỏi --- */}
-          <h3>Câu hỏi</h3>
-
-          {reading.list_question?.map((q) => {
-            const correctKey = Object.keys(q.options)[q.correct];
-            const userAnswer = userAnswers[q.id];
-
-            const isCorrect = userAnswer === correctKey;
-
-            return (
-              <div
+          {/* Danh sách câu hỏi */}
+          <div className="space-y-6">
+            {reading.list_question?.map((q, idx) => (
+              <QuestionBox
                 key={q.id}
-                style={{
-                  marginBottom: 20,
-                  padding: 15,
-                  border: "1px solid #eee",
-                  borderRadius: 8,
-                }}
-              >
-                <p style={{ fontWeight: "bold" }}>{q.text}</p>
-
-                <div style={{ marginLeft: 10 }}>
-                  {Object.entries(q.options).map(([key, val]) => {
-                    const isSelected = userAnswer === key;
-
-                    let bg = "transparent";
-                    let border = "1px solid transparent";
-
-                    if (isSelected) {
-                      bg = "#dbeafe";
-                      border = "1px solid #60a5fa";
-                    }
-
-                    // highlight sau khi reveal
-                    if (isRevealed) {
-                      if (key === correctKey) {
-                        bg = "#dcfce7"; // xanh lá – đúng
-                        border = "1px solid #22c55e";
-                      } else if (isSelected && !isCorrect) {
-                        bg = "#fee2e2"; // đỏ – sai
-                        border = "1px solid #ef4444";
-                      }
-                    }
-
-                    return (
-                      <div
-                        key={key}
-                        onClick={() => handleSelect(q.id, key)}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 10,
-                          padding: "6px 8px",
-                          borderRadius: 6,
-                          cursor: "pointer",
-                          background: bg,
-                          border: border,
-                          marginBottom: 6,
-                        }}
-                      >
-                        <input
-                          type="radio"
-                          checked={isSelected}
-                          disabled={isRevealed}
-                          onChange={() => handleSelect(q.id, key)}
-                        />
-                        <span>
-                          <strong>{key}.</strong> {val}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Giải thích khi REVEAL */}
-                {isRevealed && (
-                  <div style={{ marginTop: 10 }}>
-                    <p>
-                      <strong>Đáp án đúng:</strong> {correctKey} –{" "}
-                      {q.options[correctKey]}
-                    </p>
-
-                    <p style={{ marginTop: 5 }}>
-                      <strong>Giải thích:</strong> {q.explanation}
-                    </p>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                question={q}
+                questionIndex={idx}
+                answers={userAnswers}
+                onSelect={handleSelect}
+                reveal={isRevealed}
+              />
+            ))}
+          </div>
         </>
       )}
     </div>
