@@ -14,7 +14,7 @@ export default function ReadingListPage() {
     try {
       const data = await findUser(username.trim());
       console.log("Raw readings from BE:", data);
-      setReadings(data); // BE trả về đúng list reading
+      setReadings(data);
     } catch (error) {
       console.error("Error fetching reading:", error);
       setReadings([]);
@@ -24,49 +24,32 @@ export default function ReadingListPage() {
   }
 
   return (
-    <div style={{ padding: 20, maxWidth: 800, margin: "0 auto" }}>
-      <h1>Reading Practice</h1>
+    <div className="p-5 max-w-3xl mx-auto">
+      <h1 className="text-2xl font-bold mb-4">Find Reading By User</h1>
 
       {/* Ô tìm kiếm user */}
-      <div
-        style={{
-          display: "flex",
-          gap: 10,
-          marginBottom: 20,
-        }}
-      >
+      <div className="flex gap-2 mb-5">
         <input
           type="text"
-          placeholder="Nhập tên người dùng..."
+          placeholder="Enter the name of user..."
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          style={{
-            flex: 1,
-            padding: "10px 12px",
-            borderRadius: 6,
-            border: "1px solid #ccc",
-          }}
+          className="flex-1 px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
         />
 
         <button
           onClick={handleSearch}
-          style={{
-            padding: "10px 18px",
-            borderRadius: 6,
-            background: "#007bff",
-            color: "white",
-            border: "none",
-            cursor: "pointer",
-          }}
+          className="px-4 py-2 bg-emerald-600 text-white rounded disabled:opacity-60"
         >
           Tìm
         </button>
       </div>
 
+      {/* Nội dung reading */}
       {loading ? (
-        <p>Đang tải dữ liệu...</p>
+        <p>Loading data...</p>
       ) : readings.length === 0 ? (
-        <p>Không có bài reading nào</p>
+        <p>There are no reading passages.</p>
       ) : (
         readings.map((item, index) => (
           <ReadingItem key={index} reading={item} />
