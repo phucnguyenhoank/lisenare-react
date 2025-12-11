@@ -14,6 +14,8 @@ export default function WritingCheckPage() {
     informal: "Mkae this informal",
   };
 
+  const MAX_CHARS = 1000;
+
   const handleCheck = async () => {
     setLoading(true); // start loading
     try {
@@ -91,13 +93,20 @@ export default function WritingCheckPage() {
         {isEditing ? (
           <textarea
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value.length <= MAX_CHARS) {
+                setText(e.target.value);
+              }
+            }}
             className="w-full h-full min-h-[200px] focus:outline-none resize-none"
-            placeholder="Type here..."
+            placeholder={`Type here...`}
           />
         ) : (
           <ReviewLayer text={text} corrected={corrected} onApply={applyFix} />
         )}
+      </div>
+      <div className="text-right text-sm text-gray-500 mt-1">
+        {text.length}/{MAX_CHARS}
       </div>
 
       {/* Debug Section */}

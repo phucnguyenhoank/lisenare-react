@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { apiCall } from "../api/client";
 
 export default function TopicStep({ data, updateField, next, back }) {
   const [topics, setTopics] = useState([]);

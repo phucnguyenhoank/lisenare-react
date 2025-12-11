@@ -48,7 +48,7 @@ export default function SlideMenu({ menuOpen, onClose, onLogout }) {
 
             <li>
               <Link to="/user-reading" className="hover:text-blue-600" onClick={onClose}>
-                Tìm Kiếm Người Dùng
+                Find Reading
               </Link>
             </li>
 
