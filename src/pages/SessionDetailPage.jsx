@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { apiCall } from "../api/client";
-import { getFullReadingById } from "../api/readings";
 
 export default function SessionDetailPage() {
   const { sessionId } = useParams();
@@ -17,7 +16,7 @@ export default function SessionDetailPage() {
         setSession(sessionData);
 
         // Load reading
-        const readingData = await getFullReadingById(sessionData.reading_id);
+        const readingData = await apiCall(`/readings/full-by-id/${sessionData.reading_id}`);
         setReading(readingData);
 
       } catch (err) {

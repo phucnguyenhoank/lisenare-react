@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from "react";
 import { diffWordsWithSpace } from "diff";
-import { checkWriting } from "../api/writing"; 
 
 export default function WritingCheckPage() {
   const [text, setText] = useState("");
@@ -20,7 +19,11 @@ export default function WritingCheckPage() {
     try {
       const prompt = stylePrompts[style];
       const start = performance.now();
-      const resp = await checkWriting(prompt, text);
+      const resp = await apiCall(
+          `/coedit/edit`,
+          'POST',
+          { prompt, text }
+        );
       const end = performance.now();
       console.log(
         "Client-perceived latency (ms) Writing Check: ",

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { getSubmittedSessions } from "../api/studySessions";
 import { Link } from "react-router-dom";
 import { apiCall } from "../api/client";
 
@@ -15,7 +14,7 @@ export default function SubmittedSessionsPage() {
         const user = await apiCall("/users/me", "GET", null, {
           Authorization: `Bearer ${access_token}`,
         });
-        const data = await getSubmittedSessions(user.id);
+        const data = await apiCall(`/study_sessions/users/${user.id}/submitted`);
         setSessions(data);
       } catch (err) {
         setError(err.message);

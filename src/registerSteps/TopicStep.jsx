@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { getAllTopics } from "../api/topics";
 
 export default function TopicStep({ data, updateField, next, back }) {
   const [topics, setTopics] = useState([]);
@@ -7,7 +6,7 @@ export default function TopicStep({ data, updateField, next, back }) {
   useEffect(() => {
     async function loadTopics() {
       try {
-        const res = await getAllTopics();
+        const res = await apiCall("/topics/all", "GET");
         setTopics(res);
       } catch (err) {
         console.error("Failed to load topics:", err);
