@@ -99,7 +99,7 @@ export default function QuestionGenerator() {
       setQuestions(normalized);
     } catch (err) {
       console.error(err);
-      setError(err.message || "Lỗi khi gọi API");
+      setError(err.message || "Sinh câu hỏi thất bại!");
     } finally {
       setLoading(false);
     }
@@ -137,7 +137,7 @@ export default function QuestionGenerator() {
 
       <div className="flex items-center gap-3 mb-4">
         <div>
-          <label className="block text-sm font-medium">Số lượng câu hỏi</label>
+          <label className="block text-sm font-medium">Number Of Questions</label>
           <input
             type="number"
             min={1}

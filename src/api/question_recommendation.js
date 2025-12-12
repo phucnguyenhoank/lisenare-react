@@ -5,6 +5,7 @@ export async function generateQuestion(payload) {
         const response = await apiCall('/recommendation/questions', "POST", payload);
         return response;
     } catch (error) {
-        throw error;
+        const message = error?.message || "Lỗi trong qua trinh sinh cau hoi, vui lòng thử lại";
+        throw new Error("Sinh câu hỏi thất bại: " + message);
     }
 }

@@ -6,7 +6,7 @@ export async function findUser(username) {
     try {
         const response = await apiCall(
             `/finduser/user?username=${username}`,
-            "POST"
+            "GET"
         );
 
 
