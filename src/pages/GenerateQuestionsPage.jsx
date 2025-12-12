@@ -130,10 +130,20 @@ export default function QuestionGenerator() {
         <textarea
           rows={8}
           value={passage}
-          onChange={(e) => setPassage(e.target.value)}
+          onChange={(e) => {
+            const text = e.target.value;
+            if (text.length <= 9000) {
+              setPassage(text);   // chỉ cập nhật khi <= 9000
+            }
+            // nếu > 9000 thì KHÔNG làm gì → textarea không nhận thêm ký tự
+          }}
           className="w-full p-2 border rounded"
         />
+        <p className="text-sm text-gray-500 mt-1">
+          Max characters: {passage.length}/9000 
+        </p>
       </div>
+
 
       <div className="flex items-center gap-3 mb-4">
         <div>
